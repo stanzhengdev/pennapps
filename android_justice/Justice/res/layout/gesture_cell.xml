@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" 
-    android:layout_marginLeft="@dimen/gesture_cell_outside_margin"
-    android:layout_marginRight="@dimen/gesture_cell_outside_margin" >
+    android:padding="@dimen/gesture_cell_outside_padding" >
     
 	<TextView
 	    android:id="@+id/gestureName"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-	    android:background="#f00"
         
-        android:layout_marginTop="@dimen/gesture_cell_gesture_name_top_margin"
         android:layout_marginBottom="@dimen/gesture_cell_gesture_name_bottom_margin"
         />
 	
 	<LinearLayout
-	    android:layout_height="0dp"
+	    android:layout_height="wrap_content"
 	    android:layout_width="fill_parent"
-	    android:layout_weight="1"
+	    android:layout_below="@id/gestureName"
 	    android:orientation="horizontal"
-	    android:background="#0f0"
 
 	    android:gravity="center_vertical"
 	    >
@@ -31,6 +27,7 @@
 	        android:layout_height="@dimen/gesture_cell_app_icon_size"
 	        android:layout_width="@dimen/gesture_cell_app_icon_size"
 	        android:layout_marginRight="@dimen/gesture_cell_icon_right_margin"
+	        android:background="#222"
 	        />
 	    
 	    <TextView 
@@ -39,4 +36,15 @@
 	        android:layout_width="0dp"
 	        android:layout_weight="1"/>
 	</LinearLayout>
-</LinearLayout>
+	
+	<TextView
+	    android:id="@+id/arrow"
+	    android:layout_height="wrap_content"
+	    android:layout_width="wrap_content"
+	    android:layout_centerVertical="true"
+	    android:layout_alignParentRight="true"
+	    android:text=">"
+	    android:textSize="20dp"
+	    android:textStyle="bold"
+	    />
+</RelativeLayout>

@@ -5,21 +5,10 @@
     android:orientation="vertical"
     tools:context=".GestureListActivity" >
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="20dp"
-        android:layout_marginTop="@dimen/header_margin_top_bottom"
-        android:layout_marginBottom="@dimen/header_margin_top_bottom"
-        android:textStyle="bold"
-        android:text="@string/app_name" />
-    
     <ListView 
         android:id="@android:id/list" 
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#f00" />
+        android:layout_weight="1" />
 
 </LinearLayout>

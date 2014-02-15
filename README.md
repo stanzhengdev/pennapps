@@ -1,4 +1,6 @@
 pennapps
 ========
 
-team justice 
+team justice
+
+bringing security justice via the android and pebble platforms

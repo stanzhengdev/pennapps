@@ -1,5 +1,16 @@
 #include <pebble.h>
 
+#define SAMPLE_HISTORY_SIZE 30
+#define GESTURE_TIMER 3000
+
+static void set_timer();
+static void timer_handler();
+static void check_for_gesture();
+static void gesture_handler();
+static void gesture_reset();
+static void toggle_accelerometer();
+static void handle_accel(AccelData *accel_data, uint32_t num_samples);
+
 #define NUM_MENU_SECTIONS 1
 #define NUM_FIRST_MENU_ITEMS 3
 
@@ -12,8 +23,36 @@ static SimpleMenuLayer *simple_menu_layer;
 static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
 
+static AppTimer *timer;
+static int frequency = 100;
+bool running = false;
+bool gesture = false;
+int16_t gesture_countdown = GESTURE_TIMER;
+AccelData sample_history[SAMPLE_HISTORY_SIZE];
+static int sample_history_index = 0;
 
 enum { GESTURE_KEY, APP_KEY };
+
+/* accelerometer stuff */
+
+static void set_timer(){
+  if(running){
+    timer = app_timer_register(frequency, timer_handler, NULL);
+  }
+}
+
+static void toggle_accelerometer(){
+  running = !running;
+  if (running){
+    accel_service_set_sampling_rate(ACCEL_SAMPLING_10HZ);
+    accel_data_service_subscribe(0, handle_accel);
+  }
+  else{
+    accel_data_service_unsubscribe();
+  }
+  
+  set_timer();
+}
 
 
 static void appWindow_load(Window *window) {
@@ -66,6 +105,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 //Dummy Handlers
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) { }
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) { }
+static void handle_accel(AccelData *accel_data, uint32_t num_samples) { }
 
 
 //Appmessage handlers
@@ -91,6 +131,76 @@ static void out_failed_handler(DictionaryIterator *failed, AppMessageResult reas
   text_layer_set_text(first_name_layer, "Message");
   text_layer_set_text(last_name_layer, "failure");
 }
+
+//timer handler
+static void timer_handler(){
+  if (!running) return;
+  
+  AccelData current_sample = { .x = 0, .y = 0, .z = 0 };
+  accel_service_peek(&current_sample);
+  
+  sample_history[sample_history_index].x = current_sample.x;
+  sample_history[sample_history_index].y = current_sample.y;
+  sample_history[sample_history_index].z = current_sample.z;
+  
+  sample_history_index++;
+  
+  if (sample_history_index >= SAMPLE_HISTORY_SIZE){
+    sample_history_index = 0;
+    check_for_gesture();
+  }
+  
+  if (gesture){
+    gesture_countdown -= frequency;
+    if (gesture_countdown <= 0){
+      gesture_reset();      
+    }
+  }
+  
+  set_timer();
+}
+
+static void gesture_handler(){
+  gesture = true;
+  
+  //write and send a dictionary to the phone
+  //DictionaryIterator *iter;
+  //app_message_outbox_begin(&iter);
+  //dict_write_cstring(iter, 0, "HND");
+  //app_message_outbox_send();
+}
+
+static void gesture_reset(){
+  gesture = false;
+  gesture_countdown = GESTURE_TIMER;
+  text_layer_set_text(first_name_layer, "Pebble");
+  text_layer_set_text(last_name_layer, "Justice");
+}
+
+/* gesture detection */
+
+static void check_for_gesture(){
+  int16_t gesture_variance = 2000;
+  int16_t recent_max_y = 0;
+  int16_t recent_min_y = 0;
+  
+  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
+    
+    if (sample_history[i].y > recent_max_y){
+      recent_max_y = sample_history[i].y;
+    } 
+    
+    else if (sample_history[i].y < recent_min_y){
+      recent_min_y = sample_history[i].y;
+    }
+  }
+  
+  if (recent_max_y - recent_min_y > gesture_variance){
+    
+    gesture_handler();
+  }
+}
+
 
 
 static void click_config_provider(void *context) {

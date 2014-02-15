@@ -13,7 +13,6 @@ public class GestureCellModel {
 
 	public String packageName;
 	public String name;
-	public int iconResource;
 	public String gestureName;
 	
 	@Override
@@ -26,7 +25,6 @@ public class GestureCellModel {
 			// Set fields in the object
 			obj.put("packageName", packageName);
 			obj.put("name", name);
-			obj.put("iconResource", iconResource);
 			obj.put("gestureName", gestureName);
 		} catch (Exception e) {
 			Log.e(TAG, "Serialization failed!");
@@ -48,7 +46,6 @@ public class GestureCellModel {
 			// Pull fields out
 			result.packageName = obj.getString("packageName");
 			result.name = obj.getString("name");
-			result.iconResource = obj.getInt("iconResource");
 			result.gestureName = obj.getString("gestureName");
 
 		} catch (Exception e) {
@@ -70,7 +67,6 @@ public class GestureCellModel {
 				GestureCellModel model = new GestureCellModel();
 				model.packageName = obj.getString("packageName");
 				model.name = obj.getString("name");
-				model.iconResource = obj.getInt("iconResource");
 				model.gestureName = obj.getString("gestureName");
 				result.add(model);
 			}
@@ -89,7 +85,6 @@ public class GestureCellModel {
 				JSONObject obj = new JSONObject();
 				obj.put("packageName", model.packageName);
 				obj.put("name", model.name);
-				obj.put("iconResource", model.iconResource);
 				obj.put("gestureName", model.gestureName);
 				array.put(obj);
 			}

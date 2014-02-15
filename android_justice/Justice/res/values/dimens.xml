@@ -16,5 +16,10 @@
     <dimen name="gesture_cell_gesture_name_bottom_margin">8dp</dimen>
     <dimen name="gesture_cell_arrow_height">15dp</dimen>
     <dimen name="gesture_cell_arrow_width">8dp</dimen>
+    
+    <!-- Application cell -->
+    <dimen name="application_cell_icon_size">40dp</dimen>
+    <dimen name="application_cell_outside_padding">12dp</dimen>
+    <dimen name="application_cell_icon_right_margin">@dimen/application_cell_outside_padding</dimen>
 
 </resources>

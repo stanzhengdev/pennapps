@@ -9,9 +9,12 @@ import com.marcochiang.justice.service.JusticeService;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,7 +70,6 @@ public class GestureListActivity extends Activity {
 			for (String gesture : gestures) {
 				GestureCellModel model = new GestureCellModel();
 				model.gestureName = gesture;
-				model.iconResource = 0; // no icon (yet)
 				model.name = "Screen Unlock"; // default to a plain screen unlock
 				model.packageName = "";
 				mData.add(model);
@@ -150,8 +152,27 @@ public class GestureListActivity extends Activity {
 			GestureCellModel model = mData.get(position);
 			
 			gestureName.setText(model.gestureName);
-			appIcon.setImageResource(model.iconResource);
-			appName.setText(model.name);
+			if (model.packageName != null && !model.packageName.equals("")) {
+				// If this is a true application, show it's label and icon
+				PackageManager packageManager = mContext.getPackageManager();
+				Intent intent = new Intent();
+				intent.setComponent(new ComponentName(mContext, model.packageName));
+				ResolveInfo info = packageManager.resolveActivity(intent, 0);
+	
+				if (info != null) {
+					appName.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));
+					appIcon.setImageDrawable(info.activityInfo.applicationInfo.loadIcon(packageManager));
+				} else {
+					// Else just show its actual name and icon res
+					appName.setText(model.name);
+					appIcon.setImageResource(0); // TODO: get a default icon?
+				}
+
+			} else {
+				// Else just show its actual name and icon res
+				appName.setText(model.name);
+				appIcon.setImageResource(0); // TODO: get a default icon?
+			}
 
 			return convertView;
 		}

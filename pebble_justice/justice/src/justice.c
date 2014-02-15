@@ -129,8 +129,8 @@ static void out_failed_handler(DictionaryIterator *failed, AppMessageResult reas
 //    text_layer_set_text(last_name_layer, "connected!");
 //  }
   
-  text_layer_set_text(first_name_layer, "Message");
-  text_layer_set_text(last_name_layer, "failure");
+  //text_layer_set_text(first_name_layer, "Message");
+  //text_layer_set_text(last_name_layer, "failure");
 }
 
 //timer handler

@@ -201,54 +201,45 @@ static void check_for_gesture(){
       recent_max_x = sample_history[i].x;
     } 
     
-    else if (sample_history[i].x < recent_min_x){
+    if (sample_history[i].x < recent_min_x){
       recent_min_x = sample_history[i].x;
     }
-  }
-  
-  if (recent_max_x - recent_min_x > gesture_variance){
-    text_layer_set_text(first_name_layer, "Open X");
-    text_layer_set_text(last_name_layer, "Camera App");
-    vibes_short_pulse();
-    gesture_handler();
-  }
 
-  //checking for shake Y
-  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
-    
     if (sample_history[i].y > recent_max_y){
       recent_max_y = sample_history[i].y;
     } 
     
-    else if (sample_history[i].y < recent_min_y){
+    if (sample_history[i].y < recent_min_y){
       recent_min_y = sample_history[i].y;
     }
-  }
 
-  if (recent_max_y - recent_min_y > gesture_variance){
-    text_layer_set_text(first_name_layer, "Open Y");
-    text_layer_set_text(last_name_layer, "Justice App");
-    vibes_short_pulse();
-    gesture_handler();
-  }
-
-    //checking for shake Z
-  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
-    
     if (sample_history[i].z > recent_max_z){
       recent_max_z = sample_history[i].z;
     } 
     
-    else if (sample_history[i].z < recent_min_z){
+    if (sample_history[i].z < recent_min_z){
       recent_min_z = sample_history[i].z;
     }
-  }
-  
-  if (recent_max_x - recent_min_x > gesture_variance){
-    text_layer_set_text(first_name_layer, "Open Z");
-    text_layer_set_text(last_name_layer, "Video App");
-    vibes_short_pulse();
-    gesture_handler();
+
+    if (recent_max_x - recent_min_x > gesture_variance){
+      text_layer_set_text(first_name_layer, "Open X");
+      text_layer_set_text(last_name_layer, "Camera App");
+      vibes_short_pulse();
+      gesture_handler();
+    }
+
+    else if (recent_max_y - recent_min_y > gesture_variance){
+      text_layer_set_text(first_name_layer, "Open Y");
+      text_layer_set_text(last_name_layer, "Justice App");
+      vibes_short_pulse();
+      gesture_handler();
+    }
+    else if (recent_max_x - recent_min_x > gesture_variance){
+      text_layer_set_text(first_name_layer, "Open Z");
+      text_layer_set_text(last_name_layer, "Video App");
+      vibes_short_pulse();
+      gesture_handler();
+    }
   }
 
 }

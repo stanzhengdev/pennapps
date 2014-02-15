@@ -6,8 +6,12 @@
 
     <uses-sdk
         android:minSdkVersion="14"
-        android:targetSdkVersion="19" />
-
+        android:targetSdkVersion="14" />
+    
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -25,6 +29,16 @@
         
         <service android:name="com.marcochiang.justice.service.JusticeService" />
         <activity android:name="com.marcochiang.justice.view.GestureEditActivity" />
+        <activity android:name="com.marcochiang.justice.view.settings.SettingsActivity" />
+        
+        <receiver android:name="com.marcochiang.justice.view.settings.JusticeAdminReceiver"
+            android:label="Justice Admin Receiver"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
     </application>
-
 </manifest>

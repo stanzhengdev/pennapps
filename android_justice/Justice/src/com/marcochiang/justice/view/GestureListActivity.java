@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.marcochiang.justice.R;
 import com.marcochiang.justice.model.GestureCellModel;
 import com.marcochiang.justice.service.JusticeService;
+import com.marcochiang.justice.view.settings.SettingsActivity;
 
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,6 +17,9 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,6 +48,13 @@ public class GestureListActivity extends Activity {
 		// Start a service to listen for Pebble data
 		Intent serviceIntent = new Intent(this, JusticeService.class);
 		startService(serviceIntent);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_menu, menu);
+		return true;
 	}
 	
 	@Override
@@ -112,6 +123,16 @@ public class GestureListActivity extends Activity {
 		Log.d(TAG, "saving json: " + json);
 		editor.putString("gestures", json);
 		editor.commit();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int itemId = item.getItemId();
+		if (itemId == R.id.settings) {
+			startActivity(new Intent(this, SettingsActivity.class));
+			return true;
+		}
+		return false;
 	}
 	
 	public static class GestureCellAdapter extends ArrayAdapter<GestureCellModel> {

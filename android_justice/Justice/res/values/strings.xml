@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Justice</string>
+    <string name="app_name">Gestice</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    
+    <string name="gestice_device_admin">Justice Device Admin</string>
+    <string name="gestice_device_admin_desc">Uses password-reset technology as part of a complete
+        gesture unlocking tool.</string>
+        
+    <!-- Settings -->
+    <string name="enable_admin_button">Enable Device Admin</string>
+    <string name="enable_admin_button_finished">Device Admin Enabled!</string>
+    <string name="change_pin_button">Change PIN</string>
+    <string name="settings_header_pin">PIN</string>
+    <string name="gestice_admin_receiver_disable_warning">Gestice will not work when this receiver is disabled!</string>
+    
 
 </resources>

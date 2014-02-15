@@ -9,6 +9,7 @@
 	    android:id="@+id/gestureName"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
+        android:textSize="@dimen/gesture_cell_gesture_name_text_size"
         
         android:layout_marginBottom="@dimen/gesture_cell_gesture_name_bottom_margin"
         />
@@ -33,7 +34,9 @@
 	        android:id="@+id/appName"
 	        android:layout_height="wrap_content"
 	        android:layout_width="0dp"
-	        android:layout_weight="1"/>
+	        android:layout_weight="1"
+	        android:textSize="@dimen/gesture_cell_app_name_text_size"
+	        />
 	</LinearLayout>
 	
 	<TextView

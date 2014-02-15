@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/settings_padding" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_header_pin"
+        android:textSize="@dimen/settings_header_text_size"
+        android:textStyle="bold" />
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/settings_header" />
+
+    <Button
+        android:id="@+id/enableDeviceAdminButton"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/settings_cell_height"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/settings_cell"
+        android:gravity="left|center_vertical"
+        android:textSize="@dimen/settings_cell_main_text_size"
+        android:text="@string/enable_admin_button" />
+    
+    <!-- Divider -->
+    <FrameLayout
+        android:layout_height="0.5dp"
+        android:layout_width="fill_parent"
+        android:background="@color/settings_cell_divider_color"
+        />
+    
+    <RelativeLayout
+        android:id="@+id/changePinButton"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/settings_cell_height"
+        >
+        <TextView 
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/change_pin_button"
+            android:textSize="@dimen/settings_cell_main_text_size"
+            />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text=">"
+            android:textStyle="bold"
+            android:textSize="20dp"
+            />
+    </RelativeLayout>
+
+    <!-- Divider -->
+    <FrameLayout
+        android:layout_height="0.5dp"
+        android:layout_width="fill_parent"
+        android:background="@color/settings_cell_divider_color"
+        />
+    
+</LinearLayout>

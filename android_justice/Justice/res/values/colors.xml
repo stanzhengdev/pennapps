@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="divider_color">#666666</color>
+    <color name="transparent">#0fff</color>
+    
+    <!-- Settings -->
+    <color name="settings_header">#666666</color>
+    <color name="settings_cell_pressed">#22ffffff</color>
+    <color name="settings_cell_divider_color">#666666</color>
+
 </resources>

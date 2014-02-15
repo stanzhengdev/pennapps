@@ -13,6 +13,9 @@ static SimpleMenuSection menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem first_menu_items[NUM_FIRST_MENU_ITEMS];
 
 
+enum { GESTURE_KEY, APP_KEY };
+
+
 static void appWindow_load(Window *window) {
   int num_a_items = 0;
   first_menu_items[num_a_items++] = (SimpleMenuItem){
@@ -48,6 +51,7 @@ static void appWindow_unload(Window *window) {
   simple_menu_layer_destroy(simple_menu_layer);
 }
 
+//Select to view gesture commands
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   appWindow = window_create();
   //window_set_click_config_provider(appWindow, click_config_provider);
@@ -59,13 +63,35 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   window_stack_push(appWindow, animated);
 }
 
-static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+//Dummy Handlers
+static void up_click_handler(ClickRecognizerRef recognizer, void *context) { }
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) { }
 
+
+//Appmessage handlers
+static void in_received_handler(DictionaryIterator* iter, void* context){
+  Tuple *gesture_tuple = dict_find(iter, GESTURE_KEY);
+  Tuple *app_tuple = dict_find(iter, APP_KEY);
+  
+  char* gesture_string = gesture_tuple->value->cstring;
+  char* app_string = app_tuple->value->cstring;
+  
+  // text_layer_set_text(first_name_layer, first_name_string);
+  // text_layer_set_text(last_name_layer, last_name_string); 
 }
 
-static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
-
+static void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context)
+{
+//  if (reason == APP_MSG_NOT_CONNECTED)
+//  {
+//    text_layer_set_text(first_name_layer, "Not");
+//    text_layer_set_text(last_name_layer, "connected!");
+//  }
+  
+  text_layer_set_text(first_name_layer, "Message");
+  text_layer_set_text(last_name_layer, "failure");
 }
+
 
 static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
@@ -113,6 +139,12 @@ static void window_unload(Window *window) {
   text_layer_destroy(last_name_layer);
 }
 
+static void app_message_init(){
+  app_message_register_inbox_received(in_received_handler);
+  app_message_register_outbox_failed(out_failed_handler);
+  app_message_open(124, 124);
+}
+
 static void init(void) {
   window = window_create();
   window_set_background_color(window, GColorBlack);
@@ -131,7 +163,7 @@ static void deinit(void) {
 
 int main(void) {
   init();
-
+  app_message_init();
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
 
   app_event_loop();

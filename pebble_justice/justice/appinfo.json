@@ -1,0 +1,17 @@
+{
+  "uuid": "259047ec-66dc-4f44-b3b5-1d1477fc7a90",
+  "shortName": "justice",
+  "longName": "justice",
+  "companyName": "MakeAwesomeHappen",
+  "versionCode": 1,
+  "versionLabel": "1.0.0",
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}

@@ -95,6 +95,7 @@ public class GestureListActivity extends Activity {
 				startActivity(intent);
 			}
 		});
+		mAdapter.notifyDataSetChanged();
 	}
 	
 	// Returns true if there was saved data, false if nothing was there
@@ -155,9 +156,10 @@ public class GestureListActivity extends Activity {
 			if (model.packageName != null && !model.packageName.equals("")) {
 				// If this is a true application, show it's label and icon
 				PackageManager packageManager = mContext.getPackageManager();
-				Intent intent = new Intent();
-				intent.setComponent(new ComponentName(mContext, model.packageName));
-				ResolveInfo info = packageManager.resolveActivity(intent, 0);
+				Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+				mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+				mainIntent.setPackage(model.packageName);
+				ResolveInfo info = packageManager.queryIntentActivities(mainIntent, 0).get(0);
 	
 				if (info != null) {
 					appName.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));

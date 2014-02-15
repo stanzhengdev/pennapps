@@ -31,6 +31,8 @@ public class GestureEditActivity extends Activity {
 
 	public static final String TAG = "GestureEditActivity";
 	public static final String POSITION = "position";
+
+
 	
 	// Holds the position of this specific model in the data list
 	private int mPosition;

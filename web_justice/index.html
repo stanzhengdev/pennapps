@@ -23,6 +23,9 @@
   <script src="//js.leapmotion.com/0.3.0-beta3/leap.js"></script>
   <!-- Include Leapstrap JS -->
   <script src="//wilkesalex.github.io/leapstrap/dist/js/leapstrap.js"></script>
+  
+  <!-- Include jQuery Leap JS -->
+  <script src="/js/leap.jquery.js"></script>
 
     <!-- Just for debugging purposes. Don't actually copy this line! -->
     <!--[if lt IE 9]><script src="{{ page.base_url }}docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -34,7 +37,7 @@
     <![endif]-->
   </head>
 
-  <body>
+  <body class="leap-interactive" leap-disable-tap="true" leap-disable-hover="true">
   <nav>
     <div class="container">
       <a href="#" class="leap-interactive pull-left"><b>Gestice</b></a>
@@ -45,11 +48,11 @@
   </nav>
   <div class="wood-bg">
     <!-- Main jumbotron for a primary marketing message or call to action -->
-    <section id="demo">
+    <section id="demo" class="catcher" leap-disable-tap="true">
       <div class="container">
         <div class="row">
           <div class="col-md-6">
-            <div class="pebble">
+            <!--<div class="pebble">
               <div class="wristband">
               </div>
               <div class="screen">
@@ -58,13 +61,30 @@
                   <canvas id="pebble"></canvas>
                 </div>
               </div>
+            </div>-->
+           <div class="pebblev2">
+              <div class="frame">
+                <div class="poke-top"></div>
+                <div class="display not-success leap-interactive">
+                  Shake to Unlock
+                  <canvas id="pebblev2"></canvas>
+                </div>
+                <div class="display success leap-interactive">
+                  It works!
+                  <canvas id="pebblev2"></canvas>
+                </div>
+                <div class="poke-left"></div>
+                <div class="poke-right-1"></div>
+                <div class="poke-right-2"></div>
+                <div class="poke-bottom"></div>
+              </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="android">
               <div class="phone-shell">
                 <div class="manufacturer">GESTICE</div>
-                <div class="lcd">
+                <div class="lcd leap-interactive">
                   <div class="screen-locked">
                     <div class="android-header-bar"></div>
                     <script type="text/javascript">
@@ -80,6 +100,9 @@
                     //-->
                     </script>
                     <span>Shake to Unlock</span>
+                  </div>
+                  <div class="screen-unlocked">
+                    <time>It works!</time>
                   </div>
                 </div>
               </div>
@@ -120,21 +143,9 @@
       <footer>
         <p>&copy; Gestice 2014. Created with love at PennApps Spring 2014.</p>
       </footer>
-    </div> <!-- /container -->
+    </div> 
 
-<!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/scripts.js"></script>
 
-<script>
-LeapManager.init({
-enableMetaGestures: true,
-enableDefaultMetaGestureActions: true,
-maxCursors:1,
-enableHoverTap: true,
-enablePressDown: true,
-enableScrollbarScrolling: true,
-});
-</script>
   </body>
 </html>

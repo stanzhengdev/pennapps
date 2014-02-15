@@ -24,6 +24,7 @@
         </activity>
         
         <service android:name="com.marcochiang.justice.service.JusticeService" />
+        <activity android:name="com.marcochiang.justice.view.GestureEditActivity" />
     </application>
 
 </manifest>

@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -38,7 +40,25 @@ public class GestureListActivity extends Activity {
 		// Get references to UI components
 		mList = (ListView)findViewById(android.R.id.list);
 		
-		// Load the data from SharedPreferences
+		// Start a service to listen for Pebble data
+		Intent serviceIntent = new Intent(this, JusticeService.class);
+		startService(serviceIntent);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		// We load the data in onResume rather than in onCreate because onResume is called each time the activity
+		// is shown again. Most importantly, when we arrive back at this list after having edited an item, this method
+		// will be called to load the changes.
+
 		if (!loadGestureCellData()) {
 			// There is no data saved, so create some here and commit it
 			mData = new ArrayList<GestureCellModel>();
@@ -60,16 +80,19 @@ public class GestureListActivity extends Activity {
 		mAdapter.setData(mData);
 		mList.setAdapter(mAdapter);
 		
-		// Start a service to listen for Pebble data
-		Intent serviceIntent = new Intent(this, JusticeService.class);
-		startService(serviceIntent);
-	}
+		// Set up click handler
+		final Activity activity = this;
+		mList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				// Launch a GestureEditActivity to select a new app for this gesture
+				Intent intent = new Intent(activity, GestureEditActivity.class);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+				// Tell the new activity what gesture position to edit
+				intent.putExtra(GestureEditActivity.POSITION, position);
+				startActivity(intent);
+			}
+		});
 	}
 	
 	// Returns true if there was saved data, false if nothing was there

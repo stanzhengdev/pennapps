@@ -90,7 +90,7 @@ public class GestureCellModel {
 				obj.put("packageName", model.packageName);
 				obj.put("name", model.name);
 				obj.put("iconResource", model.iconResource);
-				obj.put("gestureName", model.iconResource);
+				obj.put("gestureName", model.gestureName);
 				array.put(obj);
 			}
 

@@ -27,6 +27,7 @@ static AppTimer *timer;
 static int frequency = 100;
 bool running = false;
 bool gesture = false;
+int axis = 0;
 int16_t gesture_countdown = GESTURE_TIMER;
 AccelData sample_history[SAMPLE_HISTORY_SIZE];
 static int sample_history_index = 0;
@@ -59,14 +60,14 @@ static void appWindow_load(Window *window) {
   int num_a_items = 0;
   first_menu_items[num_a_items++] = (SimpleMenuItem){
     // You should give each menu item a title and callback
-    .title = "Shake x = Camera",
+    .title = "Pump X = Camera",
   };
   // The menu items appear in the order saved in the menu items array
   first_menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Shake y = Justice",
+    .title = "Shake Y = Justice",
   };
   first_menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Knock = Video",
+    .title = "Knock Z = Video",
   };
 
   // Bind the menu items to the corresponding menu sections
@@ -110,11 +111,11 @@ static void handle_accel(AccelData *accel_data, uint32_t num_samples) { }
 
 //Appmessage handlers
 static void in_received_handler(DictionaryIterator* iter, void* context){
-  Tuple *gesture_tuple = dict_find(iter, GESTURE_KEY);
-  Tuple *app_tuple = dict_find(iter, APP_KEY);
+  // Tuple *gesture_tuple = dict_find(iter, GESTURE_KEY);
+  // Tuple *app_tuple = dict_find(iter, APP_KEY);
   
-  char* gesture_string = gesture_tuple->value->cstring;
-  char* app_string = app_tuple->value->cstring;
+  // char* gesture_string = gesture_tuple->value->cstring;
+  // char* app_string = app_tuple->value->cstring;
   
   // text_layer_set_text(first_name_layer, first_name_string);
   // text_layer_set_text(last_name_layer, last_name_string); 
@@ -164,10 +165,18 @@ static void gesture_handler(){
   gesture = true;
   
   //write and send a dictionary to the phone
-  //DictionaryIterator *iter;
-  //app_message_outbox_begin(&iter);
-  //dict_write_cstring(iter, 0, "HND");
-  //app_message_outbox_send();
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  if(axis == 1){
+    dict_write_cstring(iter, 0, "x");  
+  }
+  else if(axis == 2){
+    dict_write_cstring(iter, 0, "y");  
+  }
+  else if(axis == 3){
+    dict_write_cstring(iter, 0, "z");  
+  }
+  app_message_outbox_send();
 }
 
 static void gesture_reset(){
@@ -225,20 +234,23 @@ static void check_for_gesture(){
       text_layer_set_text(first_name_layer, "Open X");
       text_layer_set_text(last_name_layer, "Camera App");
       vibes_short_pulse();
-      gesture_handler();
+      axis = 1;
+      gesture_handler("x");
     }
 
     else if (recent_max_y - recent_min_y > gesture_variance){
       text_layer_set_text(first_name_layer, "Open Y");
       text_layer_set_text(last_name_layer, "Justice App");
       vibes_short_pulse();
-      gesture_handler();
+      axis = 2;
+      gesture_handler("y");
     }
-    else if (recent_max_x - recent_min_x > gesture_variance){
+    else if (recent_max_z - recent_min_z > gesture_variance){
       text_layer_set_text(first_name_layer, "Open Z");
       text_layer_set_text(last_name_layer, "Video App");
       vibes_short_pulse();
-      gesture_handler();
+      axis = 3;
+      gesture_handler("z");
     }
   }
 

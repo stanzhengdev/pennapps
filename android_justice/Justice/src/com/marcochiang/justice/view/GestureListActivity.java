@@ -7,6 +7,7 @@ import com.marcochiang.justice.model.GestureCellModel;
 import com.marcochiang.justice.service.JusticeService;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -24,7 +25,6 @@ import android.widget.TextView;
 public class GestureListActivity extends Activity {
 
 	public static final String TAG = "MainActivity";
-	private static final String PREFS = "prefs"; 
 	
 	private ListView mList;
 	private GestureCellAdapter mAdapter;
@@ -75,7 +75,7 @@ public class GestureListActivity extends Activity {
 	// Returns true if there was saved data, false if nothing was there
 	public boolean loadGestureCellData() {
 		// Get a string from SharedPreferences and convert it to a real Java object array
-		SharedPreferences prefs = getSharedPreferences(PREFS, 0);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String json = prefs.getString("gestures", null);
 		Log.d(TAG, "loaded json: " + json);
 		if (json != null) {
@@ -88,7 +88,7 @@ public class GestureListActivity extends Activity {
 	
 	public void saveGestureCellData() {
 		// Convert our data array to a JSON Array string and save it in SharedPreferences
-		SharedPreferences.Editor editor = getSharedPreferences(PREFS, 0).edit();
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
 		String json = GestureCellModel.toJSONArrayString(mData);
 		Log.d(TAG, "saving json: " + json);
 		editor.putString("gestures", json);

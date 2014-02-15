@@ -1,7 +1,17 @@
 #include <pebble.h>
 
+// Defines for Gesture Detection
 #define SAMPLE_HISTORY_SIZE 30
 #define GESTURE_TIMER 3000
+
+// Defines for the Dictionary
+#define KEY 64
+#define MAX_LIST_ITEMS (10)
+#define MAX_TEXT_LENGTH (16)
+
+// Defines for Simple Menu
+#define NUM_MENU_SECTIONS 1
+#define NUM_FIRST_MENU_ITEMS 3
 
 static void set_timer();
 static void timer_handler();
@@ -10,9 +20,6 @@ static void gesture_handler();
 static void gesture_reset();
 static void toggle_accelerometer();
 static void handle_accel(AccelData *accel_data, uint32_t num_samples);
-
-#define NUM_MENU_SECTIONS 1
-#define NUM_FIRST_MENU_ITEMS 3
 
 static Window *window;
 static Window *appWindow;
@@ -32,7 +39,31 @@ int16_t gesture_countdown = GESTURE_TIMER;
 AccelData sample_history[SAMPLE_HISTORY_SIZE];
 static int sample_history_index = 0;
 
-enum { GESTURE_KEY, APP_KEY };
+
+typedef struct {
+  char text[MAX_TEXT_LENGTH];
+} AppLauncherItem;
+
+
+static AppLauncherItem app_list[MAX_LIST_ITEMS];
+static int active_item_count = 0;
+
+static AppLauncherItem* get_item_at_index(int index) {
+  if(index < 0 || index >= MAX_LIST_ITEMS) {
+    return NULL;
+  }
+
+  return &app_list[index];
+}
+
+static void app_list_append(char *data) {
+  if(active_item_count == MAX_LIST_ITEMS)
+    return;
+
+  strcpy(app_list[active_item_count].text, data);
+  active_item_count++;
+}
+
 
 /* accelerometer stuff */
 
@@ -57,22 +88,14 @@ static void toggle_accelerometer(){
 
 
 static void appWindow_load(Window *window) {
-  int num_a_items = 0;
-  first_menu_items[num_a_items++] = (SimpleMenuItem){
-    // You should give each menu item a title and callback
-    .title = "Pump X = Camera",
-  };
-  // The menu items appear in the order saved in the menu items array
-  first_menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Shake Y = Justice",
-  };
-  first_menu_items[num_a_items++] = (SimpleMenuItem){
-    .title = "Knock Z = Video",
-  };
+ for(int i = 0; i < active_item_count; i++) {
+  first_menu_items[i] = (SimpleMenuItem){
+    .title = get_item_at_index(i)->text,};
+  }
 
   // Bind the menu items to the corresponding menu sections
   menu_sections[0] = (SimpleMenuSection){
-    .num_items = NUM_FIRST_MENU_ITEMS,
+    .num_items = active_item_count,
     .items = first_menu_items,
   };
 
@@ -111,26 +134,15 @@ static void handle_accel(AccelData *accel_data, uint32_t num_samples) { }
 
 //Appmessage handlers
 static void in_received_handler(DictionaryIterator* iter, void* context){
-  // Tuple *gesture_tuple = dict_find(iter, GESTURE_KEY);
-  // Tuple *app_tuple = dict_find(iter, APP_KEY);
-  
-  // char* gesture_string = gesture_tuple->value->cstring;
-  // char* app_string = app_tuple->value->cstring;
-  
-  // text_layer_set_text(first_name_layer, first_name_string);
-  // text_layer_set_text(last_name_layer, last_name_string); 
+  Tuple *app_tuple = dict_find(iter, KEY);
+  if (app_tuple) {
+    app_list_append(app_tuple->value->cstring);
+  }
 }
 
 static void out_failed_handler(DictionaryIterator *failed, AppMessageResult reason, void *context)
 {
-//  if (reason == APP_MSG_NOT_CONNECTED)
-//  {
-//    text_layer_set_text(first_name_layer, "Not");
-//    text_layer_set_text(last_name_layer, "connected!");
-//  }
-  
-  //text_layer_set_text(first_name_layer, "Message");
-  //text_layer_set_text(last_name_layer, "failure");
+
 }
 
 //timer handler
@@ -255,8 +267,6 @@ static void check_for_gesture(){
   }
 
 }
-
-
 
 static void click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);

@@ -180,10 +180,40 @@ static void gesture_reset(){
 /* gesture detection */
 
 static void check_for_gesture(){
-  int16_t gesture_variance = 2000;
+  int16_t gesture_variance = 2500;
+  
+  //Initiating Shake X Gesture
+  int16_t recent_max_x = 0;
+  int16_t recent_min_x = 0;
+
+  //Initiating Shake Y Gesture
   int16_t recent_max_y = 0;
   int16_t recent_min_y = 0;
+
+  //Initiating Shake Z Gesture
+  int16_t recent_max_z = 0;
+  int16_t recent_min_z = 0;
+
+  //checking for shake X
+  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
+    
+    if (sample_history[i].x > recent_max_x){
+      recent_max_x = sample_history[i].x;
+    } 
+    
+    else if (sample_history[i].x < recent_min_x){
+      recent_min_x = sample_history[i].x;
+    }
+  }
   
+  if (recent_max_x - recent_min_x > gesture_variance){
+    text_layer_set_text(first_name_layer, "Open X");
+    text_layer_set_text(last_name_layer, "Camera App");
+    vibes_short_pulse();
+    gesture_handler();
+  }
+
+  //checking for shake Y
   for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
     
     if (sample_history[i].y > recent_max_y){
@@ -194,11 +224,33 @@ static void check_for_gesture(){
       recent_min_y = sample_history[i].y;
     }
   }
-  
+
   if (recent_max_y - recent_min_y > gesture_variance){
-    
+    text_layer_set_text(first_name_layer, "Open Y");
+    text_layer_set_text(last_name_layer, "Justice App");
+    vibes_short_pulse();
     gesture_handler();
   }
+
+    //checking for shake Z
+  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
+    
+    if (sample_history[i].z > recent_max_z){
+      recent_max_z = sample_history[i].z;
+    } 
+    
+    else if (sample_history[i].z < recent_min_z){
+      recent_min_z = sample_history[i].z;
+    }
+  }
+  
+  if (recent_max_x - recent_min_x > gesture_variance){
+    text_layer_set_text(first_name_layer, "Open Z");
+    text_layer_set_text(last_name_layer, "Video App");
+    vibes_short_pulse();
+    gesture_handler();
+  }
+
 }
 
 
@@ -249,12 +301,6 @@ static void window_unload(Window *window) {
   text_layer_destroy(last_name_layer);
 }
 
-static void app_message_init(){
-  app_message_register_inbox_received(in_received_handler);
-  app_message_register_outbox_failed(out_failed_handler);
-  app_message_open(124, 124);
-}
-
 static void init(void) {
   window = window_create();
   window_set_background_color(window, GColorBlack);
@@ -265,9 +311,24 @@ static void init(void) {
   });
   const bool animated = true;
   window_stack_push(window, animated);
+
+  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
+    AccelData dummy_accel_values = { .x = 0, .y = 0, .z = 0 };
+    sample_history[i] = dummy_accel_values;
+  }
+  set_timer();
+  toggle_accelerometer();
+}
+
+static void app_message_init(){
+  app_message_register_inbox_received(in_received_handler);
+  app_message_register_outbox_failed(out_failed_handler);
+  app_message_open(124, 124);
 }
 
 static void deinit(void) {
+  if (running) toggle_accelerometer();
+  accel_data_service_unsubscribe();
   window_destroy(window);
 }
 

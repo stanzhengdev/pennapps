@@ -7,15 +7,19 @@ import com.marcochiang.justice.model.GestureCellModel;
 import com.marcochiang.justice.service.JusticeService;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -24,7 +28,6 @@ import android.widget.TextView;
 public class GestureListActivity extends Activity {
 
 	public static final String TAG = "MainActivity";
-	private static final String PREFS = "prefs"; 
 	
 	private ListView mList;
 	private GestureCellAdapter mAdapter;
@@ -38,7 +41,18 @@ public class GestureListActivity extends Activity {
 		// Get references to UI components
 		mList = (ListView)findViewById(android.R.id.list);
 		
-		// Load the data from SharedPreferences
+		// Start a service to listen for Pebble data
+		Intent serviceIntent = new Intent(this, JusticeService.class);
+		startService(serviceIntent);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		// We load the data in onResume rather than in onCreate because onResume is called each time the activity
+		// is shown again. Most importantly, when we arrive back at this list after having edited an item, this method
+		// will be called to load the changes.
+
 		if (!loadGestureCellData()) {
 			// There is no data saved, so create some here and commit it
 			mData = new ArrayList<GestureCellModel>();
@@ -47,7 +61,6 @@ public class GestureListActivity extends Activity {
 			for (String gesture : gestures) {
 				GestureCellModel model = new GestureCellModel();
 				model.gestureName = gesture;
-				model.iconResource = 0; // no icon (yet)
 				model.name = "Screen Unlock"; // default to a plain screen unlock
 				model.packageName = "";
 				mData.add(model);
@@ -60,22 +73,28 @@ public class GestureListActivity extends Activity {
 		mAdapter.setData(mData);
 		mList.setAdapter(mAdapter);
 		
-		// Start a service to listen for Pebble data
-		Intent serviceIntent = new Intent(this, JusticeService.class);
-		startService(serviceIntent);
-	}
+		// Set up click handler
+		final Activity activity = this;
+		mList.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				// Launch a GestureEditActivity to select a new app for this gesture
+				Intent intent = new Intent(activity, GestureEditActivity.class);
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+				// Tell the new activity what gesture position to edit
+				intent.putExtra(GestureEditActivity.POSITION, position);
+				startActivity(intent);
+				
+				overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
+			}
+		});
+		mAdapter.notifyDataSetChanged();
 	}
 	
 	// Returns true if there was saved data, false if nothing was there
 	public boolean loadGestureCellData() {
 		// Get a string from SharedPreferences and convert it to a real Java object array
-		SharedPreferences prefs = getSharedPreferences(PREFS, 0);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		String json = prefs.getString("gestures", null);
 		Log.d(TAG, "loaded json: " + json);
 		if (json != null) {
@@ -88,7 +107,7 @@ public class GestureListActivity extends Activity {
 	
 	public void saveGestureCellData() {
 		// Convert our data array to a JSON Array string and save it in SharedPreferences
-		SharedPreferences.Editor editor = getSharedPreferences(PREFS, 0).edit();
+		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
 		String json = GestureCellModel.toJSONArrayString(mData);
 		Log.d(TAG, "saving json: " + json);
 		editor.putString("gestures", json);
@@ -127,8 +146,28 @@ public class GestureListActivity extends Activity {
 			GestureCellModel model = mData.get(position);
 			
 			gestureName.setText(model.gestureName);
-			appIcon.setImageResource(model.iconResource);
-			appName.setText(model.name);
+			if (model.packageName != null && !model.packageName.equals("")) {
+				// If this is a true application, show it's label and icon
+				PackageManager packageManager = mContext.getPackageManager();
+				Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+				mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+				mainIntent.setPackage(model.packageName);
+				ResolveInfo info = packageManager.queryIntentActivities(mainIntent, 0).get(0);
+	
+				if (info != null) {
+					appName.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));
+					appIcon.setImageDrawable(info.activityInfo.applicationInfo.loadIcon(packageManager));
+				} else {
+					// Else just show its actual name and icon res
+					appName.setText(model.name);
+					appIcon.setImageResource(0); // TODO: get a default icon?
+				}
+
+			} else {
+				// Else just show its actual name and icon res
+				appName.setText(model.name);
+				appIcon.setImageResource(0); // TODO: get a default icon?
+			}
 
 			return convertView;
 		}

@@ -27,7 +27,6 @@
 	        android:layout_height="@dimen/gesture_cell_app_icon_size"
 	        android:layout_width="@dimen/gesture_cell_app_icon_size"
 	        android:layout_marginRight="@dimen/gesture_cell_icon_right_margin"
-	        android:background="#222"
 	        />
 	    
 	    <TextView 

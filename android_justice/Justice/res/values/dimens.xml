@@ -3,5 +3,15 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    
+    <!-- Gesture list -->
+    <dimen name="header_margin_top_bottom">20dp</dimen>
+
+    <!-- Gesture cell -->
+    <dimen name="gesture_cell_outside_margin">12dp</dimen>
+    <dimen name="gesture_cell_icon_right_margin">@dimen/gesture_cell_outside_margin</dimen>
+    <dimen name="gesture_cell_app_icon_size">40dp</dimen>
+    <dimen name="gesture_cell_gesture_name_top_margin">8dp</dimen>
+    <dimen name="gesture_cell_gesture_name_bottom_margin">8dp</dimen>
 
 </resources>

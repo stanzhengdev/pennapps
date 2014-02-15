@@ -9,7 +9,6 @@ import com.marcochiang.justice.service.JusticeService;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,7 +16,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -46,13 +44,6 @@ public class GestureListActivity extends Activity {
 		// Start a service to listen for Pebble data
 		Intent serviceIntent = new Intent(this, JusticeService.class);
 		startService(serviceIntent);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
 	}
 	
 	@Override
@@ -93,6 +84,8 @@ public class GestureListActivity extends Activity {
 				// Tell the new activity what gesture position to edit
 				intent.putExtra(GestureEditActivity.POSITION, position);
 				startActivity(intent);
+				
+				overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
 			}
 		});
 		mAdapter.notifyDataSetChanged();

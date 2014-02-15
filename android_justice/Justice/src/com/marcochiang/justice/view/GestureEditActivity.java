@@ -1,5 +1,7 @@
 package com.marcochiang.justice.view;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -15,6 +17,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,6 +47,7 @@ public class GestureEditActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.gesture_edit_activity);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		///////////////////////////////////////////////////
 		// Initialize gesture data
@@ -69,10 +73,18 @@ public class GestureEditActivity extends Activity {
 		mAdapter = new ApplicationCellAdapter(this, R.layout.appliction_cell);
 		
 		// Get all launchable applications
-		PackageManager manager = getPackageManager();
+		final PackageManager manager = getPackageManager();
 		Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
 		mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		mApplicationData = manager.queryIntentActivities(mainIntent, 0);
+		Collections.sort(mApplicationData, new Comparator<ResolveInfo>() {
+			@Override
+			public int compare(ResolveInfo a, ResolveInfo b) {
+				String aName = (String)a.activityInfo.applicationInfo.loadLabel(manager);
+				String bName = (String)b.activityInfo.applicationInfo.loadLabel(manager);
+				return aName.compareTo(bName);
+			}
+		});
 		mAdapter.setData(mApplicationData);
 		mList.setAdapter(mAdapter);
 		
@@ -93,8 +105,20 @@ public class GestureEditActivity extends Activity {
 				
 				// Finish this activity (i.e. return to main list)
 				finish();
+				overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_left);
 			}
 		});
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_left);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	public static class ApplicationCellAdapter extends ArrayAdapter<ResolveInfo> {

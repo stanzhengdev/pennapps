@@ -1,7 +1,10 @@
 package com.marcochiang.justice.view;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
+import com.getpebble.android.kit.PebbleKit;
+import com.getpebble.android.kit.util.PebbleDictionary;
 import com.marcochiang.justice.R;
 import com.marcochiang.justice.model.GestureCellModel;
 import com.marcochiang.justice.service.JusticeService;
@@ -32,6 +35,7 @@ import android.widget.TextView;
 public class GestureListActivity extends Activity {
 
 	public static final String TAG = "MainActivity";
+	public static final UUID JUSTICE_APP_UUID = UUID.fromString("259047ec-66dc-4f44-b3b5-1d1477fc7a90");
 	
 	private ListView mList;
 	private GestureCellAdapter mAdapter;
@@ -83,6 +87,14 @@ public class GestureListActivity extends Activity {
 		mAdapter = new GestureCellAdapter(this, R.layout.gesture_cell);
 		mAdapter.setData(mData);
 		mList.setAdapter(mAdapter);
+		
+		// Send data to pebble
+		PebbleDictionary data = new PebbleDictionary();
+		for (int i = 0; i < 3; i++) {
+			data.addString(i, mData.get(i).name);
+		}
+		PebbleKit.sendDataToPebble(this, JUSTICE_APP_UUID, data);
+		Log.i(TAG, "sending " + data.toJsonString() + " to pebble");
 		
 		// Set up click handler
 		final Activity activity = this;

@@ -1,5 +1,9 @@
 package com.marcochiang.justice.service;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
 
 import org.json.JSONArray;
@@ -27,6 +31,7 @@ import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
 public class JusticeService extends Service {
@@ -34,19 +39,28 @@ public class JusticeService extends Service {
 	public static final String TAG = "JusticeService";
 	public static final UUID JUSTICE_APP_UUID = UUID.fromString("259047ec-66dc-4f44-b3b5-1d1477fc7a90");
 
-	private WakeLock mWakeLock;
+	private WakeLock mFullWakeLock;
+	private WakeLock mPartialWakeLock;
 	private SensorManager mSensorManager;
 
 	public final float timeout = 3000; // 3 seconds
-	private final float threshold = 6.0f; // how far do we have to move to count as a nice gesture?
+	private final float threshold = 7.0f; // how far do we have to move to count as a full gesture?
 
 	private boolean needsInit = true;
 	private float minX, maxX, minY, maxY, minZ, maxZ;
-	private long startTime;
 	
-	// This is the all-important current axis
-	public String axis;
-	public long axisTime;
+	private String pebbleAxis;
+	private Government axisGovernment = new Government(10); // the android axis is represented by a government-like organization,
+	                                                        // whereby the majority "party" of the last 10 "elected" gestures count as
+	                                                        // the true gesture
+
+	private long androidAxisTime; // holds the time that our axis was recorded
+	private long pebbleAxisTime; // holds the time we received our pebble update
+
+	// axes are invalidated when a match is confirmed
+	private boolean validPebbleAxis;
+	private boolean validAndroidAxis;
+	
     
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -60,15 +74,67 @@ public class JusticeService extends Service {
 
 		try {
 			// Start the Justice pebble app
+			Log.i(TAG, "starting app on pebble");
 			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 
 			// Initialize the accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 2000);
 
+			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			mPartialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "never gonna give you up, never gonna let you go");
+			mPartialWakeLock.acquire();
+
 		} catch (Exception e) {
 			Log.e(TAG, "Stuff didn't work...");
 			e.printStackTrace();
+		}
+	}
+	
+	private static class Government {
+		int mSize;
+		Queue<String> mCareers;
+		Map<String, Integer> mRepresentation;
+		
+		public Government(int size) {
+			mCareers = new LinkedList<String>();
+			mRepresentation = new HashMap<String, Integer>();
+			mRepresentation.put("x", 0);
+			mRepresentation.put("y", 0);
+			mRepresentation.put("z", 0);
+			this.mSize = size;
+		}
+		
+		public void elect(String axis) {
+			mCareers.add(axis);
+			mRepresentation.put(axis, mRepresentation.get(axis) + 1);
+
+			if (mCareers.size() > mSize) {
+				String retired = mCareers.remove();
+				mRepresentation.put(retired, mRepresentation.get(retired) - 1);
+			}
+		}
+		
+		public String getMajorityParty() {
+			int x = mRepresentation.get("x");
+			int y = mRepresentation.get("y");
+			int z = mRepresentation.get("z");
+
+			// break ties arbitrarily favoring z, then y, then x
+			if (z >= x && z >= y) {
+				return "z";
+			} else if (y >= x && y >= z) {
+				return "y";
+			} else {
+				return "x";
+			}
+		}
+		
+		public void revolution() {
+			mRepresentation.put("x", 0);
+			mRepresentation.put("y", 0);
+			mRepresentation.put("z", 0);
+			mCareers.clear();
 		}
 	}
 
@@ -84,9 +150,6 @@ public class JusticeService extends Service {
 				minX = maxX = x;
 				minY = maxY = y;
 				minZ = maxZ = z;
-				
-				// Save start time
-				startTime = System.currentTimeMillis();
 				
 				needsInit = false;
 
@@ -105,26 +168,24 @@ public class JusticeService extends Service {
 				// Check if any of them exceed the threshold
 				boolean success = false;
 				if (maxX - minX > threshold) {
-					Log.i(TAG, "android x shake");
-					axis = "x";
+					Log.v(TAG, "android x shake");
+					setAndroidAxis("x");
 					success = true;
+
 				} else if (maxY - minY > threshold) {
-					Log.i(TAG, "android y shake");
-					axis = "y";
+					Log.v(TAG, "android y shake");
+					setAndroidAxis("y");
 					success = true;
+
 				} else if (maxZ - minZ > threshold) {
-					Log.i(TAG, "android z shake");
-					axis = "z";
+					Log.v(TAG, "android z shake");
+					setAndroidAxis("z");
 					success = true;
 				}
 				
 				if (success) {
-					axisTime = System.currentTimeMillis();
-				}
-				
-				if (success || System.currentTimeMillis() - startTime < timeout) {
-					// Reset initialization and start time
-					startTime = -1;
+					// Save the current system time and reset initialization
+					performActionIfValidAxes();
 					needsInit = true;
 				}
 			}
@@ -137,28 +198,24 @@ public class JusticeService extends Service {
 	  
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.i(TAG, "onStartCommand");
+		Log.d(TAG, "onStartCommand");
 
 		// Register a data receiver with the Pebble framework
-		final JusticeService service = this;
 		PebbleKit.registerReceivedDataHandler(getApplicationContext(), 
 		new PebbleKit.PebbleDataReceiver(JUSTICE_APP_UUID) {
 			@Override
 			public void receiveData(Context context, int transactionId, PebbleDictionary data) {
 				try {
+					// Get the pebble axis from the message and set it in the service
 					JSONArray array = new JSONArray(data.toJsonString());
 					JSONObject obj = (JSONObject)array.get(0);
-					
 					String axis = obj.getString("value");
+					setPebbleAxis(axis);
 					
-					Log.i(TAG, "pebble axis gesture: " + axis);
-					Log.i(TAG, "android axis gesture: " + axis);
-					if (axis.equals(service.axis) && (System.currentTimeMillis() - service.axisTime) < service.timeout) {
-						Log.e(TAG, "match!");
-					}
+					performActionIfValidAxes();
 
 				} catch (Exception e) {
-					Log.e(TAG, "JSON error (from Pebble)");
+					Log.e(TAG, "JSON error (in Pebble message)");
 					e.printStackTrace();
 				}
 			}
@@ -169,10 +226,49 @@ public class JusticeService extends Service {
 		return START_STICKY;
 	}
 	
+	public void setPebbleAxis(String axis) {
+		pebbleAxis = axis;
+		pebbleAxisTime = System.currentTimeMillis();
+		validPebbleAxis = true;
+	}
+	
+	public void setAndroidAxis(String axis) {
+		axisGovernment.elect(axis);
+		androidAxisTime = System.currentTimeMillis();
+		validAndroidAxis = true;
+	}
+	
+	public void performActionIfValidAxes() {
+
+		Log.d(TAG, "android axis: " + axisGovernment.getMajorityParty() + " (" + (System.currentTimeMillis() - androidAxisTime) + "ms ago)");
+		Log.d(TAG, "pebble axis: " + pebbleAxis + " (" + (System.currentTimeMillis() - pebbleAxisTime) + "ms ago)");
+
+		// If the axes match and didn't come in too far apart, it's a valid match!
+		if (axisGovernment.getMajorityParty().equals(pebbleAxis) && 
+				validAxes() && 
+				Math.abs(androidAxisTime - pebbleAxisTime) < timeout) {
+
+			Log.e(TAG, "match!");
+			wakeDevice();
+			invalidateAxes();
+		}
+	}
+	
+	public boolean validAxes() {
+		return validAndroidAxis && validPebbleAxis;
+	}
+	
+	public void invalidateAxes() {
+		validAndroidAxis = false;
+		validPebbleAxis = false;
+		
+		axisGovernment.revolution();
+	}
+	
 	public void wakeDevice() {
 	    PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-	    mWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-	    mWakeLock.acquire();
+	    mFullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+	    mFullWakeLock.acquire();
 
 	    KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
 		KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
@@ -210,7 +306,7 @@ public class JusticeService extends Service {
 	        		}
 	        	});
 	        	
-	        	mWakeLock.release();
+	        	mFullWakeLock.release();
 	        }
 	    });
 	}

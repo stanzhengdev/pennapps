@@ -1,5 +1,6 @@
 package com.marcochiang.justice.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -11,14 +12,22 @@ import org.json.JSONObject;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.marcochiang.justice.model.GestureCellModel;
+import com.marcochiang.justice.view.settings.JusticeAdminReceiver;
+import com.marcochiang.justice.view.settings.JusticeBroadcastReceiver;
 import com.marcochiang.justice.view.settings.SettingsActivity;
+import com.marcochiang.justice.view.settings.ShaneActivity;
 
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
+import android.app.LauncherActivity;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 
@@ -75,9 +84,6 @@ public class JusticeService extends Service {
 		super.onCreate();
 
 		try {
-			// Start the Justice pebble app
-			Log.i(TAG, "starting app on pebble");
-			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 
 			// Initialize the accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -86,6 +92,9 @@ public class JusticeService extends Service {
 			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 			mPartialWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "never gonna give you up, never gonna let you go");
 			mPartialWakeLock.acquire();
+		
+			// Start a broadcast receiver for locking the screen when it goes off
+			registerReceiver(new JusticeBroadcastReceiver(), new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
 		} catch (Exception e) {
 			Log.e(TAG, "Stuff didn't work...");
@@ -251,7 +260,7 @@ public class JusticeService extends Service {
 				Math.abs(androidAxisTime - pebbleAxisTime) < timeout) {
 
 			Log.e(TAG, "match!");
-			wakeDevice();
+			wakeDeviceToActivity(axisGovernment.getMajorityParty());
 			invalidateAxes();
 			
 			// Tell the pebble that it was a successful launch
@@ -273,70 +282,100 @@ public class JusticeService extends Service {
 		axisGovernment.revolution();
 	}
 	
+	public void wakeDeviceToActivity(final String gesture) {
+
+		// Remove password
+		DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getApplicationContext().getSystemService(DEVICE_POLICY_SERVICE);
+		devicePolicyManager.resetPassword("", 0);
+		
+		// Load the gesture cell data
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String json = prefs.getString("gestures", null);
+		Log.d(TAG, "loaded json: " + json);
+		ArrayList<GestureCellModel> data = null;
+		if (json != null) {
+			data = GestureCellModel.arrayFromString(json);
+		}
+		
+		String packageName;
+		if (gesture.equals("x")) {
+			packageName = data.get(0).packageName;
+		} else if (gesture.equals("y")) {
+			packageName = data.get(1).packageName;
+		} else {
+			packageName = data.get(2).packageName;
+		}
+		Log.i(TAG, "launching " + packageName);
+
+		Intent intent = new Intent(this, ShaneActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
+		if (packageName != null) {
+			intent.putExtra("launch-this", packageName);
+		}
+		startActivity(intent);
+	}
+
+	/*
 	public void wakeDevice() {
-	    PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-	    mFullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
-	    mFullWakeLock.acquire();
+		// Remove password
+		DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getApplicationContext().getSystemService(DEVICE_POLICY_SERVICE);
+		devicePolicyManager.resetPassword("", 0);
 
 	    KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
 		KeyguardLock keyguardLock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
 	    keyguardLock.disableKeyguard();
-	    final Handler handler = new Handler();
 
-    	/* REMOVE lock screen p/w
-    	 * 
-    	 * doesn't work :( :( :( :( :(
-    	 * can't seem to remove lock password *AND* open the screen in the same moment
-    	 * 
-		DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
-		devicePolicyManager.resetPassword("", 0);
-		*/
-		
+	    final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			public void run() {
-	        	// Builds LayoutParams for new view
-	        	int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-	                      | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-	                      | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-	                      | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
-	        	WindowManager.LayoutParams params = new WindowManager.LayoutParams(0, 0);
-	        	params.flags = flags;
-	        	params.x = 0;
-	        	params.y = 0;
-	        	params.width = 0;
-	        	params.height = 0;
-	        	params.format = PixelFormat.TRANSLUCENT;
-	        	params.windowAnimations = 0;
-	        	
-	        	// Get window manager
-	        	final WindowManager windowManager = (WindowManager)
-	        			getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-	        	
-	        	// Build a simple transparent view
-	        	final View view = new View(getApplicationContext());
-	        	view.setBackgroundColor(0x00FFFFFF); // transparent
-	        	
-	        	// Put the view in the window
-	        	windowManager.addView(view, params);
-	        	
-	        	handler.postDelayed(new Runnable() {
-	        		public void run() {
-	        			windowManager.removeView(view);
 
-			        	/* RESTORE lock screen pin
-			        	 * 
-			        	 * doesn't currently work :(
-			        	 * 
-	        			String pin = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(SettingsActivity.PIN, null);
-						DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
-						devicePolicyManager.resetPassword(pin, 0);
-						*/
-
-			        	mFullWakeLock.release();
-	        		}
-	        	}, 0);
-	        	
+			    PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+			    mFullWakeLock = powerManager.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
+			    mFullWakeLock.acquire();
+				
+				handler.postDelayed(new Runnable() {
+					public void run() {
+			        	// Builds LayoutParams for new view
+			        	int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+			                      | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+			                      | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+			                      | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD;
+			        	WindowManager.LayoutParams params = new WindowManager.LayoutParams(0, 0);
+			        	params.flags = flags;
+			        	params.x = 0;
+			        	params.y = 0;
+			        	params.width = 0;
+			        	params.height = 0;
+			        	params.format = PixelFormat.TRANSLUCENT;
+			        	params.windowAnimations = 0;
+			        	
+			        	// Get window manager
+			        	final WindowManager windowManager = (WindowManager)
+			        			getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+			        	
+			        	// Build a simple transparent view
+			        	final View view = new View(getApplicationContext());
+			        	view.setBackgroundColor(0x00FFFFFF); // transparent
+			        	
+			        	// Put the view in the window
+			        	windowManager.addView(view, params);
+			        	
+			        	handler.postDelayed(new Runnable() {
+			        		public void run() {
+			        			windowManager.removeView(view);
+		
+			        			String pin = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(SettingsActivity.PIN, null);
+								DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+								devicePolicyManager.resetPassword(pin, 0);
+		
+					        	mFullWakeLock.release();
+			        		}
+			        	}, 0);
+					}
+				}, 0);
 			}
-		}, 100);
+		}, 0);
 	}
+	*/
 }
+

@@ -95,6 +95,6 @@ public class ChangePinActivity extends Activity {
 		
 		// Actually change the lock pin!
 		DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
-		devicePolicyManager.resetPassword(pin, 0);
+		devicePolicyManager.resetPassword(pin, 0); 
 	}
 }

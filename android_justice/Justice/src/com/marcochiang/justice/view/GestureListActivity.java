@@ -8,13 +8,16 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 import com.marcochiang.justice.R;
 import com.marcochiang.justice.model.GestureCellModel;
 import com.marcochiang.justice.service.JusticeService;
+import com.marcochiang.justice.view.settings.JusticeBroadcastReceiver;
 import com.marcochiang.justice.view.settings.SettingsActivity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -48,20 +51,18 @@ public class GestureListActivity extends Activity {
 		
 		// Get references to UI components
 		mList = (ListView)findViewById(android.R.id.list);
-		
+
 		// Start a service to listen for Pebble data
 		Intent serviceIntent = new Intent(this, JusticeService.class);
 		startService(serviceIntent);
 	}
 	
-	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
-	*/
 	
 	@Override
 	public void onResume() {
@@ -89,18 +90,26 @@ public class GestureListActivity extends Activity {
 		mAdapter = new GestureCellAdapter(this, R.layout.gesture_cell);
 		mAdapter.setData(mData);
 		mList.setAdapter(mAdapter);
+
+		// Start the Justice pebble app
+		Log.i(TAG, "starting app on pebble");
+		PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 		
 		// Send data to pebble
-		PebbleDictionary data = new PebbleDictionary();
-		data.addString(100, "apps");
-		for (int i = 0; i < 3; i++) {
-			data.addString(i, mData.get(i).name);
-		}
-		PebbleKit.sendDataToPebble(this, JUSTICE_APP_UUID, data);
-		Log.i(TAG, "sending " + data.toJsonString() + " to pebble");
+		final Activity activity = this;
+		new Handler().postDelayed(new Runnable() {
+			public void run() {
+				PebbleDictionary data = new PebbleDictionary();
+				data.addString(100, "apps");
+				for (int i = 0; i < 3; i++) {
+					data.addString(i, mData.get(i).name);
+				}
+				PebbleKit.sendDataToPebble(activity, JUSTICE_APP_UUID, data);
+				Log.i(TAG, "sending " + data.toJsonString() + " to pebble");
+			}
+		}, 1000);
 		
 		// Set up click handler
-		final Activity activity = this;
 		mList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -140,7 +149,6 @@ public class GestureListActivity extends Activity {
 		editor.commit();
 	}
 	
-	/*
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int itemId = item.getItemId();
@@ -150,7 +158,6 @@ public class GestureListActivity extends Activity {
 		}
 		return false;
 	}
-	*/
 	
 	public static class GestureCellAdapter extends ArrayAdapter<GestureCellModel> {
 		

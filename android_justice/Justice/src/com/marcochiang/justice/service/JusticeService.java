@@ -2,6 +2,9 @@ package com.marcochiang.justice.service;
 
 import java.util.UUID;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
@@ -33,17 +36,17 @@ public class JusticeService extends Service {
 
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
-	private float mLastX,mLastY,mLastZ = 0;
-	private float threshold= (float) .5; //margin of error
-	private float NOISE = (float) 2+threshold; 
-	private float NOISEZ = 7+threshold;
-	private float mAccel; // acceleration apart from gravity
-	private float mAccelCurrent; // current acceleration including gravity
-	private float mAccelLast; // last acceleration including gravity
-	private boolean initalized = false;
-    private String current = null;
-    private String previous = null;
-    private String[] gestureKey = {"knock", "shakeX", "shakeY"};
+
+	public final float timeout = 3000; // 3 seconds
+	private final float threshold = 6.0f; // how far do we have to move to count as a nice gesture?
+
+	private boolean needsInit = true;
+	private float minX, maxX, minY, maxY, minZ, maxZ;
+	private long startTime;
+	
+	// This is the all-important current axis
+	public String axis;
+	public long axisTime;
     
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -54,105 +57,110 @@ public class JusticeService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d(TAG, "onCreate()");
 
 		try {
 			// Start the Justice pebble app
 			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
-			//Accelerometer
+
+			// Initialize the accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 2000);
-		    //mAccel = 0.00f;
-		    //mAccelCurrent = SensorManager.GRAVITY_EARTH;
-		    //mAccelLast = SensorManager.GRAVITY_EARTH;
+
 		} catch (Exception e) {
 			Log.e(TAG, "Stuff didn't work...");
 			e.printStackTrace();
 		}
 	}
 
-	  private final SensorEventListener mSensorListener = new SensorEventListener() {
+	private final SensorEventListener mSensorListener = new SensorEventListener() {
 
-	    public void onSensorChanged(SensorEvent se) {
-	      float x = se.values[0];
-	      float y = se.values[1];
-	      float z = se.values[2];
-	      /*
-	       * Want Acceleration? 
-	      mAccelLast = mAccelCurrent;
-	      mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
-	      float delta = mAccelCurrent - mAccelLast;
-	      mAccel = mAccel * 0.9f + delta; // perform low-cut filter*/
-	       //prints a load of shit out. Log.e(TAG, ""+mAccel);
-	      // the maximum 
-	      //if ((abs(x)<NOISE)|| (abs(y)<NOISE)|| (abs(z)>NOISEZ) ){
-	        if (!initalized) {
-	            mLastX = x;
-	            mLastY = y;
-	            mLastZ = z;
-	            initalized = true;}
-	        else{
-	            float deltaX = Math.abs(mLastX - x);
-	            float deltaY = Math.abs(mLastY - y);
-	            float deltaZ = Math.abs(mLastZ - z);
-	            if (deltaX < NOISE) deltaX = (float)0.0;
-	            if (deltaY < NOISE) deltaY = (float)0.0;
-	            if (deltaZ < NOISE) deltaZ = (float)0.0;
-	            mLastX = x;
-	            mLastY = y;
-	            mLastZ = z;	        	
-	            /**
-	             * Do movement calculation of current gesture
-	             * 
-	             */
-	            /***
-	             * The X,Y,Z
-	             * compare lastGesture to Current gesture if correct set 
-	             * public String[] gesture = {"knock", "shakeX", "shakeY"};
-	             */
-	            /** set the arrows only if above threshold**/
+		public void onSensorChanged(SensorEvent se) {
+			float x = se.values[0];
+			float y = se.values[1];
+			float z = se.values[2];
+			
+			if (needsInit) {
+				// Initialize the min/max values
+				minX = maxX = x;
+				minY = maxY = y;
+				minZ = maxZ = z;
+				
+				// Save start time
+				startTime = System.currentTimeMillis();
+				
+				needsInit = false;
 
-	            if ((deltaX > deltaY) && (mLastX>threshold)) {
-	                //Do Action X-Axis
-	                current = gestureKey[1];//   
-	                
-	            } else if ((deltaY > deltaX) && (mLastY>threshold)) {
-	                //Do Action Y-Axis
-	                current = gestureKey[2];//     
-	            } else if (abs(mLastZ) >NOISEZ) {
-	               //Do Action Z-AXIS
-	                current =gestureKey[0];//   
-	            }
-	            if (current == previous){
-	            Log.e(TAG, x+","+y+","+z);	      
-	            Log.e(TAG, current);
-	            previous =current; 
-	            }
-	        }//end of else
-	     // }//end of threshold check
-	    }//end of method 
+			} else {
 
-	    private float abs(float x) {
-			// TODO Auto-generated method stub
-			return 0;
-		}
+				// Adjust the min/max values
+				if 		(x > maxX) maxX = x;
+				else if (x < minX) minX = x;
+				
+				if 		(y > maxY) maxY = y;
+				else if (y < minY) minY = y;
+				
+				if 		(z > maxZ) maxZ = z;
+				else if (z < minZ) minZ = z;
+				
+				// Check if any of them exceed the threshold
+				boolean success = false;
+				if (maxX - minX > threshold) {
+					Log.i(TAG, "android x shake");
+					axis = "x";
+					success = true;
+				} else if (maxY - minY > threshold) {
+					Log.i(TAG, "android y shake");
+					axis = "y";
+					success = true;
+				} else if (maxZ - minZ > threshold) {
+					Log.i(TAG, "android z shake");
+					axis = "z";
+					success = true;
+				}
+				
+				if (success) {
+					axisTime = System.currentTimeMillis();
+				}
+				
+				if (success || System.currentTimeMillis() - startTime < timeout) {
+					// Reset initialization and start time
+					startTime = -1;
+					needsInit = true;
+				}
+			}
+	    }
 
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
-	    }
-	  };
+		}
+	};
 	  
 	  
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d(TAG, "onStartCommand()");
+		Log.i(TAG, "onStartCommand");
 
 		// Register a data receiver with the Pebble framework
-		Log.d(TAG, "Registering data receiver...");
+		final JusticeService service = this;
 		PebbleKit.registerReceivedDataHandler(getApplicationContext(), 
 		new PebbleKit.PebbleDataReceiver(JUSTICE_APP_UUID) {
 			@Override
 			public void receiveData(Context context, int transactionId, PebbleDictionary data) {
-				Log.i(TAG, "Received data from pebble: " + data.toJsonString());
+				try {
+					JSONArray array = new JSONArray(data.toJsonString());
+					JSONObject obj = (JSONObject)array.get(0);
+					
+					String axis = obj.getString("value");
+					
+					Log.i(TAG, "pebble axis gesture: " + axis);
+					Log.i(TAG, "android axis gesture: " + axis);
+					if (axis.equals(service.axis) && (System.currentTimeMillis() - service.axisTime) < service.timeout) {
+						Log.e(TAG, "match!");
+					}
+
+				} catch (Exception e) {
+					Log.e(TAG, "JSON error (from Pebble)");
+					e.printStackTrace();
+				}
 			}
 		});
 		

@@ -6348,6 +6348,10 @@ td.visible-print {
 .panel-primary .panel-title {
   color: #fff;
 }
+::selection {
+  background: #702500;
+  color: white;
+}
 body,
 h1,
 h2,
@@ -6444,10 +6448,17 @@ a:hover {
   margin-bottom: 4px;
   font-size: 120%;
 }
+#info .btn-border i.icon-twitter {
+  color: #55acee;
+}
 #info .btn-border:hover,
 #info .btn-border.hover {
   background: white;
   color: #702500;
+}
+#info .btn-border:hover i,
+#info .btn-border.hover i {
+  color: white;
 }
 #info .btn-border:active {
   box-shadow: 0 0 0 8px #ff4700 inset;
@@ -6734,6 +6745,18 @@ a:hover {
 #details p {
   font-size: 24px;
 }
+#details .col-md-3 img {
+  width: 100%;
+  border-radius: 200px;
+  padding: 6px;
+  background: black;
+  transition: all 0.2s ease;
+}
+#details .col-md-3 img:hover {
+  background: #ff4700;
+  -webkit-transform: rotate(30deg);
+  transform: rotate(30deg);
+}
 #details .btn-border {
   color: black;
   border: 1px solid black;
@@ -6746,12 +6769,22 @@ a:hover {
   box-shadow: none;
   font-size: 120%;
 }
-#details .btn-border:hover {
+#details .btn-border:hover,
+#details .btn-border.hover {
   background: black;
+  color: white;
+}
+#details .btn-border:hover i,
+#details .btn-border.hover i {
   color: white;
 }
 #details .btn-border:active {
   box-shadow: 0 0 0 8px #ff4700 inset;
+}
+#details .btn-border.btn-twitter:hover {
+  background: #55acee;
+  border-color: #55acee;
+  color: white;
 }
 footer {
   padding: 30px 0px;

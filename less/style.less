@@ -52,6 +52,11 @@
 
 // Custom CSS
 @import url(http://fonts.googleapis.com/css?family=Roboto);
+
+::selection {
+    background: @wood;
+    color: white;
+}
 body, h1, h2, h3, h4, h5 {
     font-family: "Avenir Next", Roboto, Arial;
 }
@@ -116,10 +121,12 @@ nav {
 }
 @wood: #702500;
 @pebble: #FF4700;
+@twitter: #55acee;
 a:hover {
     color: @pebble;
 }
 #info {
+
     text-align: center;
     color: white;
     padding: 20px;
@@ -136,9 +143,15 @@ a:hover {
         margin-top: 2px;
         margin-bottom: 4px;
         font-size: 120%;
+        i.icon-twitter {
+            color: @twitter;
+        }
         &:hover, &.hover {
             background: white;
             color: @wood;
+            i {
+                color: white;
+            }
         }
         &:active {
             box-shadow: 0 0 0 8px @pebble inset;
@@ -405,11 +418,24 @@ a:hover {
     //         display: none!important;
     //     }
     // }
-
 }
 #details {
     p {
         font-size: 24px;
+    }
+    .col-md-3 {
+        img {
+            width: 100%;
+            border-radius: 200px;
+            padding: 6px;
+            background: black;
+            transition: all 0.2s ease;
+            &:hover {
+                background: @pebble;
+                -webkit-transform: rotate(30deg);
+                transform: rotate(30deg);
+            }
+        }
     }
     .btn-border {
         color: black;
@@ -422,12 +448,23 @@ a:hover {
         margin-top: 1em;
         box-shadow: none;
         font-size: 120%;
-        &:hover {
+        //i.fa-twitter {
+        //    color: @twitter;
+        //}
+        &:hover, &.hover {
             background: black;
             color: white;
+            i {
+                color: white;
+            }
         }
         &:active {
             box-shadow: 0 0 0 8px @pebble inset;
+        }
+        &.btn-twitter:hover {
+            background: @twitter;
+            border-color: @twitter;
+            color: white;
         }
     }
 }

@@ -33,13 +33,16 @@ public class JusticeService extends Service {
 
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
-	private float x,y,z = 0;
-	private float treshold = 0;
+	private float mLastX,mLastY,mLastZ = 0;
+	private float NOISE = (float) 0.05; //margin of error
+	private float threshold= (float) 0.1;
 	private float mAccel; // acceleration apart from gravity
 	private float mAccelCurrent; // current acceleration including gravity
 	private float mAccelLast; // last acceleration including gravity
 	private boolean initalized = false;
-
+    private String current = null;
+    private String[] gestureKey = {"knock", "shakeX", "shakeY"};
+    
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO: Learn what this method does and implement it properly
@@ -56,7 +59,7 @@ public class JusticeService extends Service {
 			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 			//Accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 2000);
 		    mAccel = 0.00f;
 		    mAccelCurrent = SensorManager.GRAVITY_EARTH;
 		    mAccelLast = SensorManager.GRAVITY_EARTH;
@@ -69,9 +72,9 @@ public class JusticeService extends Service {
 	  private final SensorEventListener mSensorListener = new SensorEventListener() {
 
 	    public void onSensorChanged(SensorEvent se) {
-	      float tempX = se.values[0];
-	      float tempY = se.values[1];
-	      float tempZ = se.values[2];
+	      float x = se.values[0];
+	      float y = se.values[1];
+	      float z = se.values[2];
 	      /*
 	      mAccelLast = mAccelCurrent;
 	      mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
@@ -79,16 +82,45 @@ public class JusticeService extends Service {
 	      mAccel = mAccel * 0.9f + delta; // perform low-cut filter*/
 	       //prints a load of shit out. Log.e(TAG, ""+mAccel);
 	        if (!initalized) {
-	            x = tempX;
-	            y = tempY;
-	            y = tempZ;
+	            mLastX = x;
+	            mLastY = y;
+	            mLastZ = z;
 	            initalized = true;}
 	        else{
-	        	
-	        	
-	        }
+	            float deltaX = Math.abs(mLastX - x);
+	            float deltaY = Math.abs(mLastY - y);
+	            float deltaZ = Math.abs(mLastZ - z);
+	            if (deltaX < NOISE) deltaX = (float)0.0;
+	            if (deltaY < NOISE) deltaY = (float)0.0;
+	            if (deltaZ < NOISE) deltaZ = (float)0.0;
+	            mLastX = x;
+	            mLastY = y;
+	            mLastZ = z;	        	
+	            /**
+	             * Do movement calculation of current gesture
+	             * 
+	             */
+	            /***
+	             * The X,Y,Z
+	             * compare lastGesture to Current gesture if correct set 
+	             * public String[] gesture = {"knock", "shakeX", "shakeY"};
+	             */
+	            /** set the arrows only if above threshold**/
+	            Log.e(TAG, x+","+y+","+z);	            
+	            if ((deltaX > deltaY) && (mLastX>threshold)) {
+	                //iv.setImageResource(R.drawable.shaker_fig_1);
+	                current = gestureKey[1];//   
+	                
+	            } else if ((deltaY > deltaX) && (mLastY>threshold)) {
+	                //iv.setImageResource(R.drawable.shaker_fig_2);
+	                current = gestureKey[2];//     
+	            } else if (mLastZ >threshold) {
+	               //iv.setVisibility(View.INVISIBLE);
+	                current =gestureKey[0];//   
+	            }
+	            //Log.e(TAG, current);
+	        }//end of else
 	        
-		
 	    }//end of method 
 
 	    public void onAccuracyChanged(Sensor sensor, int accuracy) {

@@ -32,8 +32,6 @@ public class GestureEditActivity extends Activity {
 	public static final String TAG = "GestureEditActivity";
 	public static final String POSITION = "position";
 
-
-	
 	// Holds the position of this specific model in the data list
 	private int mPosition;
 	private GestureCellModel mModel;
@@ -87,6 +85,10 @@ public class GestureEditActivity extends Activity {
 				return aName.compareTo(bName);
 			}
 		});
+
+		// Add a null value to the front --- this (for now!) will represent our default option!
+		mApplicationData.add(0, null);
+
 		mAdapter.setData(mApplicationData);
 		mList.setAdapter(mAdapter);
 		
@@ -96,8 +98,13 @@ public class GestureEditActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// Save the information in the model
 				ResolveInfo applicationData = mApplicationData.get(position);
-				mModel.packageName = applicationData.activityInfo.packageName;
-				mModel.name = (String) applicationData.activityInfo.loadLabel(getPackageManager());
+				if (applicationData != null) {
+					mModel.packageName = applicationData.activityInfo.packageName;
+					mModel.name = (String) applicationData.activityInfo.loadLabel(getPackageManager());
+				} else {
+					mModel.packageName = "";
+					mModel.name = "Screen Unlock";
+				}
 				mGesturesData.set(mPosition, mModel);
 				
 				// Save the data to SharedPreferences
@@ -160,9 +167,15 @@ public class GestureEditActivity extends Activity {
 			
 			// Set data
 			ResolveInfo info = mData.get(position);
-			PackageManager packageManager = mContext.getPackageManager();
-			icon.setImageDrawable(info.activityInfo.loadIcon(packageManager));
-			name.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));
+			if (info != null) {
+				PackageManager packageManager = mContext.getPackageManager();
+				icon.setImageDrawable(info.activityInfo.loadIcon(packageManager));
+				name.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));
+			} else {
+				// Null data is a sentinel for the default "no app" option
+				icon.setImageResource(R.drawable.ic_action_screen_locked_to_portrait);
+				name.setText("Screen Unlock");
+			}
 			
 			return convertView;
 		}

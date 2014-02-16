@@ -4,38 +4,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical" 
     android:padding="@dimen/gesture_cell_outside_padding" >
-    
-	<TextView
-	    android:id="@+id/gestureName"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent"
-        android:textSize="@dimen/gesture_cell_gesture_name_text_size"
-        
-        android:layout_marginBottom="@dimen/gesture_cell_gesture_name_bottom_margin"
+
+    <ImageView
+        android:id="@+id/appIcon"
+        android:layout_height="@dimen/gesture_cell_app_icon_size"
+        android:layout_width="@dimen/gesture_cell_app_icon_size"
+        android:layout_marginRight="@dimen/gesture_cell_icon_right_margin"
         />
 	
 	<LinearLayout
 	    android:layout_height="wrap_content"
 	    android:layout_width="fill_parent"
-	    android:layout_below="@id/gestureName"
-	    android:orientation="horizontal"
+	    android:layout_toRightOf="@id/appIcon"
+	    android:orientation="vertical"
+	    android:layout_centerVertical="true"
 
 	    android:gravity="center_vertical"
 	    >
-
-	    <ImageView
-	        android:id="@+id/appIcon"
-	        android:layout_height="@dimen/gesture_cell_app_icon_size"
-	        android:layout_width="@dimen/gesture_cell_app_icon_size"
-	        android:layout_marginRight="@dimen/gesture_cell_icon_right_margin"
-	        />
 	    
 	    <TextView 
 	        android:id="@+id/appName"
 	        android:layout_height="wrap_content"
-	        android:layout_width="0dp"
-	        android:layout_weight="1"
+	        android:layout_width="fill_parent"
 	        android:textSize="@dimen/gesture_cell_app_name_text_size"
+	        android:layout_marginTop="@dimen/gesture_cell_app_name_top_margin"
+	        android:layout_marginBottom="@dimen/gesture_cell_text_margin"
+	        />
+	    
+		<TextView
+		    android:id="@+id/gestureName"
+	        android:layout_height="wrap_content"
+	        android:layout_width="fill_parent"
+	        android:textSize="@dimen/gesture_cell_gesture_name_text_size"
+	        
+	        android:layout_marginBottom="@dimen/gesture_cell_gesture_name_bottom_margin"
 	        />
 	</LinearLayout>
 	

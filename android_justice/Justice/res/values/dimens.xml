@@ -3,10 +3,12 @@
     <!-- Gesture cell -->
     <dimen name="gesture_cell_outside_padding">12dp</dimen>
     <dimen name="gesture_cell_icon_right_margin">@dimen/gesture_cell_outside_padding</dimen>
-    <dimen name="gesture_cell_app_icon_size">40dp</dimen>
     <dimen name="gesture_cell_gesture_name_text_size">14dp</dimen>
-    <dimen name="gesture_cell_app_name_text_size">18dp</dimen>
     <dimen name="gesture_cell_gesture_name_bottom_margin">8dp</dimen>
+    <dimen name="gesture_cell_app_icon_size">60dp</dimen>
+    <dimen name="gesture_cell_app_name_top_margin">4dp</dimen>
+    <dimen name="gesture_cell_app_name_text_size">22dp</dimen>
+    <dimen name="gesture_cell_text_margin">4dp</dimen>
     
     <!-- Application cell -->
     <dimen name="application_cell_icon_size">40dp</dimen>

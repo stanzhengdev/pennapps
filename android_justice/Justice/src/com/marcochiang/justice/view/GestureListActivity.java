@@ -176,18 +176,15 @@ public class GestureListActivity extends Activity {
 				ResolveInfo info = packageManager.queryIntentActivities(mainIntent, 0).get(0);
 	
 				if (info != null) {
+					// Get app data --- name and icon
 					appName.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));
 					appIcon.setImageDrawable(info.activityInfo.applicationInfo.loadIcon(packageManager));
-				} else {
-					// Else just show its actual name and icon res
-					appName.setText(model.name);
-					appIcon.setImageResource(0); // TODO: get a default icon?
 				}
 
 			} else {
 				// Else just show its actual name and icon res
 				appName.setText(model.name);
-				appIcon.setImageResource(0); // TODO: get a default icon?
+				appIcon.setImageResource(R.drawable.ic_action_screen_locked_to_portrait);
 			}
 
 			return convertView;

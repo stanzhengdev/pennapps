@@ -2,18 +2,32 @@
 <resources>
 
     <string name="app_name">Gestice</string>
+
+    <!-- Menus -->
     <string name="action_settings">Settings</string>
+    <string name="action_save">Save</string>
     
     <string name="gestice_device_admin">Justice Device Admin</string>
     <string name="gestice_device_admin_desc">Uses password-reset technology as part of a complete
         gesture unlocking tool.</string>
         
     <!-- Settings -->
+    <string name="settings_activity_title">Settings</string>
     <string name="enable_admin_button">Enable Device Admin</string>
     <string name="enable_admin_button_finished">Device Admin Enabled!</string>
     <string name="change_pin_button">Change PIN</string>
     <string name="settings_header_pin">PIN</string>
     <string name="gestice_admin_receiver_disable_warning">Gestice will not work when this receiver is disabled!</string>
+    
+    <!-- Change pin -->
+    <string name="change_pin_activity_title">Change PIN</string>
+    <string name="enter_pin_hint">Enter PIN</string>
+    <string name="confirm_pin_hint">Confirm PIN</string>
+    <string name="change_pin_error_matches">PINs must match</string>
+    <string name="change_pin_error_numeric">PINs must be numeric</string>
+    <string name="change_pin_error_length">PINs must be between 4 and 20 digits</string>
+    <string name="change_pin_cancel">Your changes have been discarded</string>
+    <string name="change_pin_success">Your new PIN has been saved!</string>
     
 
 </resources>

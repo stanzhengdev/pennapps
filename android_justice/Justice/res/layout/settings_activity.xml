@@ -4,11 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/settings_padding" >
+    android:paddingTop="@dimen/settings_padding"
+    android:paddingBottom="@dimen/settings_padding" >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
+        android:paddingLeft="@dimen/settings_padding"
+        android:paddingRight="@dimen/settings_padding"
+
         android:text="@string/settings_header_pin"
         android:textSize="@dimen/settings_header_text_size"
         android:textStyle="bold" />
@@ -16,13 +21,21 @@
     <FrameLayout
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="@color/settings_header" />
+        android:background="@color/settings_header"
+
+        android:layout_marginLeft="@dimen/settings_padding"
+        android:layout_marginRight="@dimen/settings_padding"
+        />
 
     <Button
         android:id="@+id/enableDeviceAdminButton"
         android:layout_width="fill_parent"
         android:layout_height="@dimen/settings_cell_height"
         android:layout_gravity="center_horizontal"
+
+        android:paddingLeft="@dimen/settings_padding"
+        android:paddingRight="@dimen/settings_padding"
+
         android:background="@drawable/settings_cell"
         android:gravity="left|center_vertical"
         android:textSize="@dimen/settings_cell_main_text_size"
@@ -33,13 +46,21 @@
         android:layout_height="0.5dp"
         android:layout_width="fill_parent"
         android:background="@color/settings_cell_divider_color"
+        android:layout_marginLeft="@dimen/settings_padding"
+        android:layout_marginRight="@dimen/settings_padding"
         />
     
     <RelativeLayout
         android:id="@+id/changePinButton"
         android:layout_width="fill_parent"
+
+        android:paddingLeft="@dimen/settings_padding"
+        android:paddingRight="@dimen/settings_padding"
+
         android:layout_height="@dimen/settings_cell_height"
+        android:background="@drawable/settings_cell"
         >
+
         <TextView 
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
@@ -64,6 +85,8 @@
         android:layout_height="0.5dp"
         android:layout_width="fill_parent"
         android:background="@color/settings_cell_divider_color"
+        android:layout_marginLeft="@dimen/settings_padding"
+        android:layout_marginRight="@dimen/settings_padding"
         />
     
 </LinearLayout>

@@ -11,24 +11,39 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 
 public class SettingsActivity extends Activity {
 	
 	public static final String TAG = "SettingsActivity";
+	public static final String PIN = "pin";
 
 	private final int ENABLE_ADMIN_REQUEST_CODE = 1000;
 	
 	private Button mEnableDeviceAdminButton;
+	private RelativeLayout mChangePinButton;
 	
 	@Override 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings_activity);
+		setTitle(getResources().getString(R.string.settings_activity_title));
 		
 		//////////////////////////////////////////////////////////
 		// Buttons
 		//////////////////////////////////////////////////////////
 		mEnableDeviceAdminButton = (Button)findViewById(R.id.enableDeviceAdminButton);
+		mChangePinButton = (RelativeLayout)findViewById(R.id.changePinButton);
+
+		final Activity activity = this;
+		mChangePinButton.setOnClickListener(new OnClickListener() {
+			public void onClick(View view) {
+				// Start a change pin activity
+				Intent intent = new Intent(activity, ChangePinActivity.class);
+				startActivity(intent);
+				overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
+			}
+		});
 	}
 	
 	@Override

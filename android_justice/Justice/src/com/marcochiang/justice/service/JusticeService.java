@@ -35,13 +35,14 @@ public class JusticeService extends Service {
 	private SensorManager mSensorManager;
 	private float mLastX,mLastY,mLastZ = 0;
 	private float threshold= (float) .5; //margin of error
-	private float NOISE = (float) 3+threshold; 
-	private float NOISEZ = 9+threshold;
+	private float NOISE = (float) 2+threshold; 
+	private float NOISEZ = 7+threshold;
 	private float mAccel; // acceleration apart from gravity
 	private float mAccelCurrent; // current acceleration including gravity
 	private float mAccelLast; // last acceleration including gravity
 	private boolean initalized = false;
     private String current = null;
+    private String previous = null;
     private String[] gestureKey = {"knock", "shakeX", "shakeY"};
     
 	@Override
@@ -60,10 +61,10 @@ public class JusticeService extends Service {
 			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 			//Accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 4000);
-		    mAccel = 0.00f;
-		    mAccelCurrent = SensorManager.GRAVITY_EARTH;
-		    mAccelLast = SensorManager.GRAVITY_EARTH;
+		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 2000);
+		    //mAccel = 0.00f;
+		    //mAccelCurrent = SensorManager.GRAVITY_EARTH;
+		    //mAccelLast = SensorManager.GRAVITY_EARTH;
 		} catch (Exception e) {
 			Log.e(TAG, "Stuff didn't work...");
 			e.printStackTrace();
@@ -84,7 +85,7 @@ public class JusticeService extends Service {
 	      mAccel = mAccel * 0.9f + delta; // perform low-cut filter*/
 	       //prints a load of shit out. Log.e(TAG, ""+mAccel);
 	      // the maximum 
-	      if ((abs(x)<NOISE)|| (abs(y)<NOISE)|| (abs(z)>NOISEZ) ){
+	      //if ((abs(x)<NOISE)|| (abs(y)<NOISE)|| (abs(z)>NOISEZ) ){
 	        if (!initalized) {
 	            mLastX = x;
 	            mLastY = y;
@@ -110,7 +111,7 @@ public class JusticeService extends Service {
 	             * public String[] gesture = {"knock", "shakeX", "shakeY"};
 	             */
 	            /** set the arrows only if above threshold**/
-	            Log.e(TAG, x+","+y+","+z);	            
+
 	            if ((deltaX > deltaY) && (mLastX>threshold)) {
 	                //Do Action X-Axis
 	                current = gestureKey[1];//   
@@ -122,9 +123,13 @@ public class JusticeService extends Service {
 	               //Do Action Z-AXIS
 	                current =gestureKey[0];//   
 	            }
+	            if (current == previous){
+	            Log.e(TAG, x+","+y+","+z);	      
 	            Log.e(TAG, current);
+	            previous =current; 
+	            }
 	        }//end of else
-	      }//end of threshold check
+	     // }//end of threshold check
 	    }//end of method 
 
 	    private float abs(float x) {

@@ -10,6 +10,9 @@
     <string name="gestice_device_admin">Justice Device Admin</string>
     <string name="gestice_device_admin_desc">Uses password-reset technology as part of a complete
         gesture unlocking tool.</string>
+    <string name="header_text">NOTE: Gestice will not run correctly unless you a) enable us as a 
+        Device Admin (with the ability to change your lock screen password) and b) set a PIN
+        for your device through our Settings page.</string>
         
     <!-- Settings -->
     <string name="settings_activity_title">Settings</string>

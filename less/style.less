@@ -52,7 +52,9 @@
 
 // Custom CSS
 @import url(http://fonts.googleapis.com/css?family=Roboto);
-
+body, h1, h2, h3, h4, h5 {
+    font-family: "Avenir Next", Roboto, Arial;
+}
 h1, h2, h3, h4, h5 {
     color: inherit;
 }
@@ -62,25 +64,86 @@ nav {
     text-align: right;
     a {
         display: inline-block;
+        position: relative;
         color: #222;
-        padding: 0px 2em;
+        padding: 0px 36px;
         border-right: solid 1px #E3E3E3;
         border-left: solid 1px #E3E3E3;
         margin-right: -6px;
         margin-left: 0px;
+        &:after {
+            content: '';
+            height: 2px;
+            background: @pebble;
+            left: 20px;
+            right: 20px;
+            display: block;
+            position: absolute;
+            top: 4em;
+            // padding: 0 50%;
+            opacity: 0;
+            transition: all 0.2s ease;
+            -moz-transition: all 0.2s ease;
+            -webkit-transition: all 0.2s ease;
+            -ms-transition: all 0.2s ease;
+            -o-transition: all 0.2s ease;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+        &:hover:after, &.active:after, &.hover:after {
+            top: 3em;
+            opacity: 1;
+        }
+        &:hover, &.hover {
+            text-decoration: none;
+        }
+        &.active, &.hover {
+            color: @pebble;
+        }
+    }
+    .pull-left {
+        font-size: 120%;
+        padding-left: 18px;
+        img {
+            height: 3.5em;
+            margin-right: 18px;
+        }
     }
 }
 .wood-bg {
     background: url(http://i.imgur.com/fEmKv9W.jpg) gray;
 }
 @wood: #702500;
-@pebble: FF4700;
+@pebble: #FF4700;
+a:hover {
+    color: @pebble;
+}
 #info {
     text-align: center;
     color: white;
     padding: 20px;
     font-size: 30px;
     background: @wood;
+    .btn-border {
+        color: white;
+        border: 1px solid white;
+        border-radius: 150px;
+        vertical-align: middle;
+        display: inline-block;
+        padding: 0 1em;
+        line-height: 3em;
+        margin-top: 2px;
+        margin-bottom: 4px;
+        font-size: 120%;
+        &:hover, &.hover {
+            background: white;
+            color: @wood;
+        }
+        &:active {
+            box-shadow: 0 0 0 8px @pebble inset;
+        }
+    }  
 }
 #demo {
     padding-top: 80px;
@@ -89,6 +152,13 @@ nav {
     box-shadow: inset 0 -2px 2px gray, inset 0 2px 2px gray;
     .pebble {
         transition: all 0.25s ease-in-out;
+        max-width: 225px;
+        height: 330px;
+        margin: auto;
+        display: block;
+        position: relative;
+        -webkit-animation: fall-up 1s ease;
+        animation: fall-up 1s ease;
         .frame {
             background-color: #ba625a;
             max-width: 225px;
@@ -103,31 +173,30 @@ nav {
             background: linear-gradient(-6deg,#b96961 0%,#b02b26 20%,#9f2b27 21%);
             box-shadow: 0 0 2px black;
             position: relative;
+            z-index: 2;
             .poke-top {
                 max-width: 65%;
                 display: block;
                 margin: auto;
                 background: #2e2b25;
-                height: 24px;
-                margin-top: -4px;
+                height: 40px;
+                margin-top: -15px;
+                box-shadow: 0 0 2px black;
             }
             .poke-bottom {
                 max-width: 65%;
                 display: block;
                 margin: auto;
                 background: #2e2b25;
-                height: 24px;
-                margin-top: 100%;
-                position: absolute;
-                bottom: 0px;
-                display: block;
+                height: 200px;
+                box-shadow: 0 0 2px black;
             }
             .display {
                 display: block;
                 background: white;
                 position: relative;
                 margin: 35px;
-                height: 200px;
+                height: 180px;
                 background: black!important;
                 color: white!important;
                 text-align: center!important;
@@ -157,6 +226,45 @@ nav {
             }
 
         }
+        .poke-left {
+            display: block;
+            margin: auto;
+            background: #2e2b25;
+            height: 75px;
+            box-shadow: 0 0 2px black;
+            position: absolute;
+            width: 20px;
+            margin-left: -10px;
+            top: 83px;
+            left: 0px;
+            border-radius: 4px;
+            z-index: 1;
+        }
+        .poke-right-1 {
+            display: block;
+            margin: auto;
+            background: #2e2b25;
+            height: 75px;
+            box-shadow: 0 0 2px black;
+            position: absolute;
+            width: 20px;
+            margin-right: -10px;
+            top: 48px;
+            left: 0px;
+            right: 0px;
+            border-radius: 4px;
+            z-index: 1;
+        }
+        .poke-right-2 {
+            .poke-right-1;
+            top: 140px;
+            height: 50px;
+        }
+        .poke-right-3 {
+            .poke-right-1;
+            top: 204px;
+            height: 75px;
+        }
         &.grabbed .display.not-success, .display.hover.not-success {
             display: none!important;
         }
@@ -167,7 +275,7 @@ nav {
             height: 350px;
             width: 120px;
             margin: auto;
-            background-color: #4a4a4a;
+            background-color: #4a4a4;
             border-top-left-radius: 120px;
             border-top-right-radius: 120px;
         }
@@ -198,9 +306,11 @@ nav {
     } */
     .android {
         transition: all 0.25s ease-in-out;
+        -webkit-animation: fall-up 2s ease;
+        animation: fall-up 2s ease;
         .phone-shell {
-            height: 350px;
-            max-width: 400px;
+            height: 400px;
+            max-width: 450px;
             margin: auto;
             background-color: #2d2d2d;
             padding: 8px;
@@ -236,6 +346,14 @@ nav {
                     top: 0; left: 0;
                     background: black;
                     z-index: 50;
+                    color: #383838;
+                    background: linear-gradient(170deg, #000000 0%,#111111 10%,#2b2b2b 26%,#1c1c1c 41%,#131313 100%);
+                    time {
+                        font-size: 80px;
+                        font-family: Roboto;
+                        display: block;
+
+                    }
                 }
                 .screen-locked {
                     position: absolute;
@@ -288,6 +406,30 @@ nav {
     //     }
     // }
 
+}
+#details {
+    p {
+        font-size: 24px;
+    }
+    .btn-border {
+        color: black;
+        border: 1px solid black;
+        border-radius: 50px;
+        vertical-align: middle;
+        display: inline-block;
+        padding: 0 1em;
+        line-height: 3em;
+        margin-top: 1em;
+        box-shadow: none;
+        font-size: 120%;
+        &:hover {
+            background: black;
+            color: white;
+        }
+        &:active {
+            box-shadow: 0 0 0 8px @pebble inset;
+        }
+    }
 }
 footer {
     padding: 30px 0px;
@@ -355,7 +497,7 @@ footer {
 }
 
 .pebble.grabbed {
-    transform: scale(110%); -webkit-transform: scale(110%);
+    transform: scale(1.05); -webkit-transform: scale(1.05);
     .not-success {
         opacity: 0;
         display: none!important;
@@ -365,20 +507,72 @@ footer {
     opacity: 0;
 }
 .pebble.activated {
-    -webkit-animation: shake 1s;
-    animation: shake 1s;
+    transform: scale(1); -webkit-transform: scale(1);
+    -webkit-animation: shake 1s!important;
+    animation: shake 1s!important;
     .success {
         opacity: 0;
         display: none!important;
     }
 }
 .android.activated {
-    -webkit-animation: shake 1s;
-    animation: shake 1s;
+    -webkit-animation: shake 1s!important;
+    animation: shake 1s!important;
     .screen-locked {
         transition: all 0.75s 5s ease-in-out;
         transform: translateY(50px) scale(.35); -webkit-transform: translateY(50px) scale(.35);
         opacity: 0;
+    }
+}
+@-webkit-keyframes fall-up {
+    0% {
+        opacity: 0;
+        -webkit-transform: translateY(1000px);
+        transform: translateY(1000px)
+    }
+
+    60% {
+        opacity: 1;
+        -webkit-transform: translateY(-30px);
+        transform: translateY(-30px)
+    }
+
+    80% {
+        -webkit-transform: translateY(10px);
+        transform: translateY(10px)
+    }
+
+    100% {
+        -webkit-transform: translateY(0);
+        transform: translateY(0)
+    }
+}
+
+@keyframes fall-up {
+    0% {
+        opacity: 0.5;
+        -webkit-transform: translateY(1000px);
+        -ms-transform: translateY(1000px);
+        transform: translateY(1000px)
+    }
+
+    60% {
+        opacity: 1;
+        -webkit-transform: translateY(-30px);
+        -ms-transform: translateY(-30px);
+        transform: translateY(-30px)
+    }
+
+    80% {
+        -webkit-transform: translateY(10px);
+        -ms-transform: translateY(10px);
+        transform: translateY(10px)
+    }
+
+    100% {
+        -webkit-transform: translateY(0);
+        -ms-transform: translateY(0);
+        transform: translateY(0)
     }
 }
 

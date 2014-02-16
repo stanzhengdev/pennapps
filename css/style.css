@@ -6348,6 +6348,14 @@ td.visible-print {
 .panel-primary .panel-title {
   color: #fff;
 }
+body,
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "Avenir Next", Roboto, Arial;
+}
 h1,
 h2,
 h3,
@@ -6356,21 +6364,66 @@ h5 {
   color: inherit;
 }
 nav {
-  border-top: 4px solid FF4700;
+  border-top: 4px solid #ff4700;
   line-height: 4em;
   text-align: right;
 }
 nav a {
   display: inline-block;
+  position: relative;
   color: #222;
-  padding: 0px 2em;
+  padding: 0px 36px;
   border-right: solid 1px #E3E3E3;
   border-left: solid 1px #E3E3E3;
   margin-right: -6px;
   margin-left: 0px;
 }
+nav a:after {
+  content: '';
+  height: 2px;
+  background: #ff4700;
+  left: 20px;
+  right: 20px;
+  display: block;
+  position: absolute;
+  top: 4em;
+  opacity: 0;
+  transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+nav a:hover:after,
+nav a.active:after,
+nav a.hover:after {
+  top: 3em;
+  opacity: 1;
+}
+nav a:hover,
+nav a.hover {
+  text-decoration: none;
+}
+nav a.active,
+nav a.hover {
+  color: #ff4700;
+}
+nav .pull-left {
+  font-size: 120%;
+  padding-left: 18px;
+}
+nav .pull-left img {
+  height: 3.5em;
+  margin-right: 18px;
+}
 .wood-bg {
   background: url(http://i.imgur.com/fEmKv9W.jpg) #808080;
+}
+a:hover {
+  color: #ff4700;
 }
 #info {
   text-align: center;
@@ -6378,6 +6431,26 @@ nav a {
   padding: 20px;
   font-size: 30px;
   background: #702500;
+}
+#info .btn-border {
+  color: white;
+  border: 1px solid white;
+  border-radius: 150px;
+  vertical-align: middle;
+  display: inline-block;
+  padding: 0 1em;
+  line-height: 3em;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  font-size: 120%;
+}
+#info .btn-border:hover,
+#info .btn-border.hover {
+  background: white;
+  color: #702500;
+}
+#info .btn-border:active {
+  box-shadow: 0 0 0 8px #ff4700 inset;
 }
 #demo {
   padding-top: 80px;
@@ -6390,7 +6463,7 @@ nav a {
             height: 350px;
             width: 120px;
             margin: auto;
-            background-color: #4a4a4a;
+            background-color: #4a4a4;
             border-top-left-radius: 120px;
             border-top-right-radius: 120px;
         }
@@ -6422,6 +6495,13 @@ nav a {
 }
 #demo .pebble {
   transition: all 0.25s ease-in-out;
+  max-width: 225px;
+  height: 330px;
+  margin: auto;
+  display: block;
+  position: relative;
+  -webkit-animation: fall-up 1s ease;
+  animation: fall-up 1s ease;
 }
 #demo .pebble .frame {
   background-color: #ba625a;
@@ -6437,31 +6517,31 @@ nav a {
   background: linear-gradient(-6deg, #b96961 0%, #b02b26 20%, #9f2b27 21%);
   box-shadow: 0 0 2px black;
   position: relative;
+  z-index: 2;
 }
 #demo .pebble .frame .poke-top {
   max-width: 65%;
   display: block;
   margin: auto;
   background: #2e2b25;
-  height: 24px;
-  margin-top: -4px;
+  height: 40px;
+  margin-top: -15px;
+  box-shadow: 0 0 2px black;
 }
 #demo .pebble .frame .poke-bottom {
   max-width: 65%;
+  display: block;
   margin: auto;
   background: #2e2b25;
-  height: 24px;
-  margin-top: 100%;
-  position: absolute;
-  bottom: 0px;
-  display: block;
+  height: 200px;
+  box-shadow: 0 0 2px black;
 }
 #demo .pebble .frame .display {
   display: block;
   background: white;
   position: relative;
   margin: 35px;
-  height: 200px;
+  height: 180px;
   background: black!important;
   color: white!important;
   text-align: center!important;
@@ -6490,16 +6570,80 @@ nav a {
 #demo .pebble .frame .display .paths.leap-interactive:hover {
   box-shadow: inset 0 0 0 4px yellow;
 }
+#demo .pebble .poke-left {
+  display: block;
+  margin: auto;
+  background: #2e2b25;
+  height: 75px;
+  box-shadow: 0 0 2px black;
+  position: absolute;
+  width: 20px;
+  margin-left: -10px;
+  top: 83px;
+  left: 0px;
+  border-radius: 4px;
+  z-index: 1;
+}
+#demo .pebble .poke-right-1 {
+  display: block;
+  margin: auto;
+  background: #2e2b25;
+  height: 75px;
+  box-shadow: 0 0 2px black;
+  position: absolute;
+  width: 20px;
+  margin-right: -10px;
+  top: 48px;
+  left: 0px;
+  right: 0px;
+  border-radius: 4px;
+  z-index: 1;
+}
+#demo .pebble .poke-right-2 {
+  display: block;
+  margin: auto;
+  background: #2e2b25;
+  height: 75px;
+  box-shadow: 0 0 2px black;
+  position: absolute;
+  width: 20px;
+  margin-right: -10px;
+  top: 48px;
+  left: 0px;
+  right: 0px;
+  border-radius: 4px;
+  z-index: 1;
+  top: 140px;
+  height: 50px;
+}
+#demo .pebble .poke-right-3 {
+  display: block;
+  margin: auto;
+  background: #2e2b25;
+  box-shadow: 0 0 2px black;
+  position: absolute;
+  width: 20px;
+  margin-right: -10px;
+  top: 48px;
+  left: 0px;
+  right: 0px;
+  border-radius: 4px;
+  z-index: 1;
+  top: 204px;
+  height: 75px;
+}
 #demo .pebble.grabbed .display.not-success,
 #demo .pebble .display.hover.not-success {
   display: none!important;
 }
 #demo .android {
   transition: all 0.25s ease-in-out;
+  -webkit-animation: fall-up 2s ease;
+  animation: fall-up 2s ease;
 }
 #demo .android .phone-shell {
-  height: 350px;
-  max-width: 400px;
+  height: 400px;
+  max-width: 450px;
   margin: auto;
   background-color: #2d2d2d;
   padding: 8px;
@@ -6536,6 +6680,13 @@ nav a {
   left: 0;
   background: black;
   z-index: 50;
+  color: #383838;
+  background: linear-gradient(170deg, #000000 0%, #111111 10%, #2b2b2b 26%, #1c1c1c 41%, #131313 100%);
+}
+#demo .android .phone-shell .lcd .screen-off time {
+  font-size: 80px;
+  font-family: Roboto;
+  display: block;
 }
 #demo .android .phone-shell .lcd .screen-locked {
   position: absolute;
@@ -6579,6 +6730,28 @@ nav a {
 #demo .android .phone-shell .lcd .screen-unlocked .row .col-md-3 img {
   max-width: 100%!important;
   padding: 8px;
+}
+#details p {
+  font-size: 24px;
+}
+#details .btn-border {
+  color: black;
+  border: 1px solid black;
+  border-radius: 50px;
+  vertical-align: middle;
+  display: inline-block;
+  padding: 0 1em;
+  line-height: 3em;
+  margin-top: 1em;
+  box-shadow: none;
+  font-size: 120%;
+}
+#details .btn-border:hover {
+  background: black;
+  color: white;
+}
+#details .btn-border:active {
+  box-shadow: 0 0 0 8px #ff4700 inset;
 }
 footer {
   padding: 30px 0px;
@@ -6654,8 +6827,8 @@ footer {
   }
 }
 .pebble.grabbed {
-  transform: scale(110%);
-  -webkit-transform: scale(110%);
+  transform: scale(1.05);
+  -webkit-transform: scale(1.05);
 }
 .pebble.grabbed .not-success {
   opacity: 0;
@@ -6665,20 +6838,66 @@ footer {
   opacity: 0;
 }
 .pebble.activated {
-  -webkit-animation: shake 1s;
-  animation: shake 1s;
+  transform: scale(1);
+  -webkit-transform: scale(1);
+  -webkit-animation: shake 1s!important;
+  animation: shake 1s!important;
 }
 .pebble.activated .success {
   opacity: 0;
   display: none!important;
 }
 .android.activated {
-  -webkit-animation: shake 1s;
-  animation: shake 1s;
+  -webkit-animation: shake 1s!important;
+  animation: shake 1s!important;
 }
 .android.activated .screen-locked {
   transition: all 0.75s 5s ease-in-out;
   transform: translateY(50px) scale(0.35);
   -webkit-transform: translateY(50px) scale(0.35);
   opacity: 0;
+}
+@-webkit-keyframes fall-up {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(1000px);
+    transform: translateY(1000px);
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: translateY(-30px);
+    transform: translateY(-30px);
+  }
+  80% {
+    -webkit-transform: translateY(10px);
+    transform: translateY(10px);
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+@keyframes fall-up {
+  0% {
+    opacity: 0.5;
+    -webkit-transform: translateY(1000px);
+    -ms-transform: translateY(1000px);
+    transform: translateY(1000px);
+  }
+  60% {
+    opacity: 1;
+    -webkit-transform: translateY(-30px);
+    -ms-transform: translateY(-30px);
+    transform: translateY(-30px);
+  }
+  80% {
+    -webkit-transform: translateY(10px);
+    -ms-transform: translateY(10px);
+    transform: translateY(10px);
+  }
+  100% {
+    -webkit-transform: translateY(0);
+    -ms-transform: translateY(0);
+    transform: translateY(0);
+  }
 }

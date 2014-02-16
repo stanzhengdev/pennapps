@@ -4,7 +4,6 @@ import com.marcochiang.justice.R;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;

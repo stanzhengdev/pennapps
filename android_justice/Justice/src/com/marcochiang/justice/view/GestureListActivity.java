@@ -1,6 +1,7 @@
 package com.marcochiang.justice.view;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.getpebble.android.kit.PebbleKit;
@@ -8,7 +9,6 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 import com.marcochiang.justice.R;
 import com.marcochiang.justice.model.GestureCellModel;
 import com.marcochiang.justice.service.JusticeService;
-import com.marcochiang.justice.view.settings.JusticeBroadcastReceiver;
 import com.marcochiang.justice.view.settings.SettingsActivity;
 
 import android.os.Bundle;
@@ -17,7 +17,6 @@ import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -72,15 +71,22 @@ public class GestureListActivity extends Activity {
 		// will be called to load the changes.
 
 		if (!loadGestureCellData()) {
+			final PackageManager manager = getPackageManager();
+			Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+			mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			List<ResolveInfo> applicationData = manager.queryIntentActivities(mainIntent, 0);
+
 			// There is no data saved, so create some here and commit it
 			mData = new ArrayList<GestureCellModel>();
-			
 			String[] gestures = { "X-Axis Shake", "Y-Axis Shake", "Z-Axis Shake" };
-			for (String gesture : gestures) {
+			for (int i = 0; i < gestures.length; i++) {
+				// Just use the top three apps from the queryIntentActivities call...
+				ResolveInfo data = applicationData.get(i);
 				GestureCellModel model = new GestureCellModel();
-				model.gestureName = gesture;
-				model.name = "Screen Unlock"; // default to a plain screen unlock
-				model.packageName = "";
+
+				model.gestureName = gestures[i];
+				model.name = (String)data.activityInfo.loadLabel(manager);
+				model.packageName = data.activityInfo.packageName;
 				mData.add(model);
 			}
 			saveGestureCellData();
@@ -96,6 +102,8 @@ public class GestureListActivity extends Activity {
 		PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 		
 		// Send data to pebble
+		// Note: Do this in a handler because the message sometimes gets to the device
+		// before the application has loaded, which is no bueno
 		final Activity activity = this;
 		new Handler().postDelayed(new Runnable() {
 			public void run() {
@@ -204,11 +212,6 @@ public class GestureListActivity extends Activity {
 					appName.setText(info.activityInfo.applicationInfo.loadLabel(packageManager));
 					appIcon.setImageDrawable(info.activityInfo.applicationInfo.loadIcon(packageManager));
 				}
-
-			} else {
-				// Else just show its actual name and icon res
-				appName.setText(model.name);
-				appIcon.setImageResource(R.drawable.ic_action_screen_locked_to_portrait);
 			}
 
 			return convertView;

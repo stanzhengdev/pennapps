@@ -1,4 +1,6 @@
-package com.marcochiang.justice.view.settings;
+package com.marcochiang.justice.receiver;
+
+import com.marcochiang.justice.view.settings.SettingsActivity;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;

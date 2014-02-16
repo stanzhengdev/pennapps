@@ -1,4 +1,4 @@
-package com.marcochiang.justice.view.settings;
+package com.marcochiang.justice.receiver;
 
 import com.marcochiang.justice.R;
 

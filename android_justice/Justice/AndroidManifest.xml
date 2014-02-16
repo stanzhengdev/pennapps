@@ -31,9 +31,9 @@
         <activity android:name="com.marcochiang.justice.view.GestureEditActivity" />
         <activity android:name="com.marcochiang.justice.view.settings.SettingsActivity" />
         <activity android:name="com.marcochiang.justice.view.settings.ChangePinActivity" />
-        <activity android:name="com.marcochiang.justice.view.settings.ShaneActivity" />
+        <activity android:name="com.marcochiang.justice.view.BridgeActivity" />
         
-        <receiver android:name="com.marcochiang.justice.view.settings.JusticeAdminReceiver"
+        <receiver android:name="com.marcochiang.justice.receiver.JusticeAdminReceiver"
             android:label="@string/gestice_device_admin"
             android:description="@string/gestice_device_admin_desc"
             android:permission="android.permission.BIND_DEVICE_ADMIN">

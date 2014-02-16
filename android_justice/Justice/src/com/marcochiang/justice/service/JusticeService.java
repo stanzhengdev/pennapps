@@ -13,23 +13,16 @@ import org.json.JSONObject;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.marcochiang.justice.model.GestureCellModel;
-import com.marcochiang.justice.view.settings.JusticeAdminReceiver;
-import com.marcochiang.justice.view.settings.JusticeBroadcastReceiver;
-import com.marcochiang.justice.view.settings.SettingsActivity;
-import com.marcochiang.justice.view.settings.ShaneActivity;
+import com.marcochiang.justice.receiver.JusticeBroadcastReceiver;
+import com.marcochiang.justice.view.BridgeActivity;
 
-import android.app.KeyguardManager;
-import android.app.KeyguardManager.KeyguardLock;
-import android.app.LauncherActivity;
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
-import android.os.Handler;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -41,16 +34,13 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
-import android.view.WindowManager;
 
-@SuppressWarnings("deprecation")
+@SuppressLint("Wakelock")
 public class JusticeService extends Service {
 	
 	public static final String TAG = "JusticeService";
 	public static final UUID JUSTICE_APP_UUID = UUID.fromString("259047ec-66dc-4f44-b3b5-1d1477fc7a90");
 
-	private WakeLock mFullWakeLock;
 	private WakeLock mPartialWakeLock;
 	private SensorManager mSensorManager;
 
@@ -84,7 +74,6 @@ public class JusticeService extends Service {
 		super.onCreate();
 
 		try {
-
 			// Initialize the accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 2000);
@@ -307,7 +296,7 @@ public class JusticeService extends Service {
 		}
 		Log.i(TAG, "launching " + packageName);
 
-		Intent intent = new Intent(this, ShaneActivity.class);
+		Intent intent = new Intent(this, BridgeActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY);
 		if (packageName != null) {
 			intent.putExtra("launch-this", packageName);

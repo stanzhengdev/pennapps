@@ -1,6 +1,7 @@
 package com.marcochiang.justice.view.settings;
 
 import com.marcochiang.justice.R;
+import com.marcochiang.justice.receiver.JusticeAdminReceiver;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;

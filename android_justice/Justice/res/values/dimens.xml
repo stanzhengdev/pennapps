@@ -19,5 +19,10 @@
     <dimen name="settings_header_text_size">18dp</dimen>
     <dimen name="settings_cell_height">64dp</dimen>
     <dimen name="settings_cell_main_text_size">18dp</dimen>
+    
+    <!-- Change PIN -->
+    <dimen name="change_pin_padding">12dp</dimen>
+    <dimen name="change_pin_edit_text_margin">12dp</dimen>
+    <dimen name="pin_text_size">30dp</dimen>
 
 </resources>

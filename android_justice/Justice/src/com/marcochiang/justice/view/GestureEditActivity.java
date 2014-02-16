@@ -123,6 +123,12 @@ public class GestureEditActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_left);
+	}
+	
 	public static class ApplicationCellAdapter extends ArrayAdapter<ResolveInfo> {
 		
 		private Context mContext;

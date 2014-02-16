@@ -11,10 +11,12 @@ import org.json.JSONObject;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.marcochiang.justice.view.settings.SettingsActivity;
 
 import android.app.KeyguardManager;
 import android.app.KeyguardManager.KeyguardLock;
 import android.app.Service;
+import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
@@ -28,10 +30,10 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 @SuppressWarnings("deprecation")
 public class JusticeService extends Service {
@@ -251,6 +253,12 @@ public class JusticeService extends Service {
 			Log.e(TAG, "match!");
 			wakeDevice();
 			invalidateAxes();
+			
+			// Tell the pebble that it was a successful launch
+			PebbleDictionary data = new PebbleDictionary();
+			data.addString(100, "matched");
+			data.addString(0, "success");
+			PebbleKit.sendDataToPebble(getApplicationContext(), JUSTICE_APP_UUID, data);
 		}
 	}
 	
@@ -271,10 +279,21 @@ public class JusticeService extends Service {
 	    mFullWakeLock.acquire();
 
 	    KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-		KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("TAG");
+		KeyguardLock keyguardLock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
 	    keyguardLock.disableKeyguard();
-	    new Handler().post(new Runnable() {
-	        public void run(){
+	    final Handler handler = new Handler();
+
+    	/* REMOVE lock screen p/w
+    	 * 
+    	 * doesn't work :( :( :( :( :(
+    	 * can't seem to remove lock password *AND* open the screen in the same moment
+    	 * 
+		DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+		devicePolicyManager.resetPassword("", 0);
+		*/
+		
+		handler.postDelayed(new Runnable() {
+			public void run() {
 	        	// Builds LayoutParams for new view
 	        	int flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
 	                      | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
@@ -300,14 +319,24 @@ public class JusticeService extends Service {
 	        	// Put the view in the window
 	        	windowManager.addView(view, params);
 	        	
-	        	new Handler().post(new Runnable() {
+	        	handler.postDelayed(new Runnable() {
 	        		public void run() {
 	        			windowManager.removeView(view);
+
+			        	/* RESTORE lock screen pin
+			        	 * 
+			        	 * doesn't currently work :(
+			        	 * 
+	        			String pin = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(SettingsActivity.PIN, null);
+						DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+						devicePolicyManager.resetPassword(pin, 0);
+						*/
+
+			        	mFullWakeLock.release();
 	        		}
-	        	});
+	        	}, 0);
 	        	
-	        	mFullWakeLock.release();
-	        }
-	    });
+			}
+		}, 100);
 	}
 }

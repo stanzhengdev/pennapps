@@ -3,6 +3,9 @@ package com.marcochiang.justice.view.settings;
 import com.marcochiang.justice.R;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -89,5 +92,9 @@ public class ChangePinActivity extends Activity {
 		SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
 		editor.putString(SettingsActivity.PIN, pin);
 		editor.commit();
+		
+		// Actually change the lock pin!
+		DevicePolicyManager devicePolicyManager = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+		devicePolicyManager.resetPassword(pin, 0);
 	}
 }

@@ -54,12 +54,14 @@ public class GestureListActivity extends Activity {
 		startService(serviceIntent);
 	}
 	
+	/*
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main_menu, menu);
 		return true;
 	}
+	*/
 	
 	@Override
 	public void onResume() {
@@ -90,6 +92,7 @@ public class GestureListActivity extends Activity {
 		
 		// Send data to pebble
 		PebbleDictionary data = new PebbleDictionary();
+		data.addString(100, "apps");
 		for (int i = 0; i < 3; i++) {
 			data.addString(i, mData.get(i).name);
 		}
@@ -137,6 +140,7 @@ public class GestureListActivity extends Activity {
 		editor.commit();
 	}
 	
+	/*
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int itemId = item.getItemId();
@@ -146,6 +150,7 @@ public class GestureListActivity extends Activity {
 		}
 		return false;
 	}
+	*/
 	
 	public static class GestureCellAdapter extends ArrayAdapter<GestureCellModel> {
 		

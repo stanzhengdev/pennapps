@@ -2,12 +2,13 @@
 
 // Defines for Gesture Detection
 #define SAMPLE_HISTORY_SIZE 30
-#define GESTURE_TIMER 3000
+#define GESTURE_TIMER 2000
 
 // Defines for the Dictionary
 #define KEY 64
 #define MAX_LIST_ITEMS (10)
 #define MAX_TEXT_LENGTH (16)
+#define THRESHOLD 2500
 
 // Defines for Simple Menu
 #define NUM_MENU_SECTIONS 1
@@ -15,7 +16,7 @@
 
 static void set_timer();
 static void timer_handler();
-static void check_for_gesture();
+//static void check_for_gesture();
 static void gesture_handler();
 static void gesture_reset();
 static void toggle_accelerometer();
@@ -35,35 +36,13 @@ static int frequency = 100;
 bool running = false;
 bool gesture = false;
 int axis = 0;
+char* first_string;
+char* second_string;
+char* third_string;
 int16_t gesture_countdown = GESTURE_TIMER;
 AccelData sample_history[SAMPLE_HISTORY_SIZE];
-static int sample_history_index = 0;
 
-
-typedef struct {
-  char text[MAX_TEXT_LENGTH];
-} AppLauncherItem;
-
-
-static AppLauncherItem app_list[MAX_LIST_ITEMS];
-static int active_item_count = 0;
-
-static AppLauncherItem* get_item_at_index(int index) {
-  if(index < 0 || index >= MAX_LIST_ITEMS) {
-    return NULL;
-  }
-
-  return &app_list[index];
-}
-
-static void app_list_append(char *data) {
-  if(active_item_count == MAX_LIST_ITEMS)
-    return;
-
-  strcpy(app_list[active_item_count].text, data);
-  active_item_count++;
-}
-
+enum { FIRST_KEY, SECOND_KEY, THIRD_KEY };
 
 /* accelerometer stuff */
 
@@ -88,14 +67,22 @@ static void toggle_accelerometer(){
 
 
 static void appWindow_load(Window *window) {
- for(int i = 0; i < active_item_count; i++) {
-  first_menu_items[i] = (SimpleMenuItem){
-    .title = get_item_at_index(i)->text,};
-  }
+ int num_a_items = 0;
+    first_menu_items[num_a_items++] = (SimpleMenuItem){
+    // You should give each menu item a title and callback
+    .title = first_string,
+  };
+  // The menu items appear in the order saved in the menu items array
+  first_menu_items[num_a_items++] = (SimpleMenuItem){
+    .title = second_string,
+  };
+  first_menu_items[num_a_items++] = (SimpleMenuItem){
+    .title = third_string,
+  };
 
   // Bind the menu items to the corresponding menu sections
   menu_sections[0] = (SimpleMenuSection){
-    .num_items = active_item_count,
+    .num_items = NUM_FIRST_MENU_ITEMS,
     .items = first_menu_items,
   };
 
@@ -134,9 +121,32 @@ static void handle_accel(AccelData *accel_data, uint32_t num_samples) { }
 
 //Appmessage handlers
 static void in_received_handler(DictionaryIterator* iter, void* context){
-  Tuple *app_tuple = dict_find(iter, KEY);
-  if (app_tuple) {
-    app_list_append(app_tuple->value->cstring);
+  char *type = dict_find(iter, 100)->value->cstring;
+
+  if (strcmp("apps", type) == 0) {
+    Tuple *first_tuple = dict_find(iter, FIRST_KEY);
+    Tuple *second_tuple = dict_find(iter, SECOND_KEY);
+    Tuple *third_tuple = dict_find(iter, THIRD_KEY);
+
+    first_string = first_tuple->value->cstring;
+    second_string = second_tuple->value->cstring;
+    third_string = third_tuple->value->cstring;
+  } else if (strcmp("matched", type) == 0) {
+    char *result = dict_find(iter, FIRST_KEY)->value->cstring;
+
+    if (strcmp(result, "success")){
+      text_layer_set_text(first_name_layer, "Launch");
+      if(axis==0){
+        text_layer_set_text(last_name_layer, first_string);  
+      }
+      else if(axis==1){
+        text_layer_set_text(last_name_layer, second_string);  
+      }
+      else if(axis==2){
+        text_layer_set_text(last_name_layer, third_string);  
+      }
+      vibes_short_pulse();
+    }
   }
 }
 
@@ -149,19 +159,55 @@ static void out_failed_handler(DictionaryIterator *failed, AppMessageResult reas
 static void timer_handler(){
   if (!running) return;
   
+  static bool needsInit = true;
+  static float minX, maxX, minY, maxY, minZ, maxZ;
+  
   AccelData current_sample = { .x = 0, .y = 0, .z = 0 };
   accel_service_peek(&current_sample);
   
-  sample_history[sample_history_index].x = current_sample.x;
-  sample_history[sample_history_index].y = current_sample.y;
-  sample_history[sample_history_index].z = current_sample.z;
-  
-  sample_history_index++;
-  
-  if (sample_history_index >= SAMPLE_HISTORY_SIZE){
-    sample_history_index = 0;
-    check_for_gesture();
-  }
+  float x = current_sample.x;
+  float y = current_sample.y;
+  float z = current_sample.z;
+
+  if (needsInit) {
+    // Initialize the min/max values
+    minX = maxX = x;
+    minY = maxY = y;
+    minZ = maxZ = z;
+
+    needsInit = false;
+
+  } else {
+
+    // Adjust the min/max values
+    if      (x > maxX) maxX = x;
+    else if (x < minX) minX = x;
+    if      (y > maxY) maxY = y;
+    else if (y < minY) minY = y;
+    if      (z > maxZ) maxZ = z;
+    else if (z < minZ) minZ = z;
+
+    // Check if any of them have exceeded our threshold
+    bool success = false;
+    if (maxX - minX > THRESHOLD) {
+      success = true;
+      axis = 0;
+      gesture_handler();
+    } else if (maxY - minY > THRESHOLD) {
+      success = true;
+      axis = 1;
+      gesture_handler();
+    } else if (maxZ - minZ > THRESHOLD) {
+      success = true;
+      axis = 2;
+      gesture_handler();
+    }
+
+    if (success) {
+      // DO THE THING WHERE YOU SEND THE MESSAGE TO ANDROID
+      needsInit = true;
+    }
+  } 
   
   if (gesture){
     gesture_countdown -= frequency;
@@ -179,14 +225,14 @@ static void gesture_handler(){
   //write and send a dictionary to the phone
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
-  if(axis == 1){
-    dict_write_cstring(iter, 0, "x");  
+  if(axis==0){
+    dict_write_cstring(iter, 0, "x");
   }
-  else if(axis == 2){
-    dict_write_cstring(iter, 0, "y");  
+  else if(axis==1){
+    dict_write_cstring(iter, 0, "y");
   }
-  else if(axis == 3){
-    dict_write_cstring(iter, 0, "z");  
+  else if(axis==2){
+    dict_write_cstring(iter, 0, "z");
   }
   app_message_outbox_send();
 }
@@ -196,76 +242,6 @@ static void gesture_reset(){
   gesture_countdown = GESTURE_TIMER;
   text_layer_set_text(first_name_layer, "Pebble");
   text_layer_set_text(last_name_layer, "Justice");
-}
-
-/* gesture detection */
-
-static void check_for_gesture(){
-  int16_t gesture_variance = 2500;
-  
-  //Initiating Shake X Gesture
-  int16_t recent_max_x = 0;
-  int16_t recent_min_x = 0;
-
-  //Initiating Shake Y Gesture
-  int16_t recent_max_y = 0;
-  int16_t recent_min_y = 0;
-
-  //Initiating Shake Z Gesture
-  int16_t recent_max_z = 0;
-  int16_t recent_min_z = 0;
-
-  //checking for shake X
-  for (int i = 0; i < SAMPLE_HISTORY_SIZE; i++){
-    
-    if (sample_history[i].x > recent_max_x){
-      recent_max_x = sample_history[i].x;
-    } 
-    
-    if (sample_history[i].x < recent_min_x){
-      recent_min_x = sample_history[i].x;
-    }
-
-    if (sample_history[i].y > recent_max_y){
-      recent_max_y = sample_history[i].y;
-    } 
-    
-    if (sample_history[i].y < recent_min_y){
-      recent_min_y = sample_history[i].y;
-    }
-
-    if (sample_history[i].z > recent_max_z){
-      recent_max_z = sample_history[i].z;
-    } 
-    
-    if (sample_history[i].z < recent_min_z){
-      recent_min_z = sample_history[i].z;
-    }
-
-    if (recent_max_x - recent_min_x > gesture_variance){
-      text_layer_set_text(first_name_layer, "Open X");
-      text_layer_set_text(last_name_layer, "Camera App");
-      vibes_short_pulse();
-      axis = 1;
-      gesture_handler("x");
-    }
-
-    else if (recent_max_y - recent_min_y > gesture_variance){
-      text_layer_set_text(first_name_layer, "Open Y");
-      text_layer_set_text(last_name_layer, "Justice App");
-      vibes_short_pulse();
-      axis = 2;
-      gesture_handler("y");
-    }
-    else if (recent_max_z - recent_min_z > gesture_variance){
-      text_layer_set_text(first_name_layer, "Open Z");
-      text_layer_set_text(last_name_layer, "Video App");
-      vibes_short_pulse();
-      axis = 3;
-      gesture_handler("z");
-    }
-  }
-
 }
 
 static void click_config_provider(void *context) {

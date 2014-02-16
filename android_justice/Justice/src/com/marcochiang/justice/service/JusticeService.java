@@ -34,8 +34,9 @@ public class JusticeService extends Service {
 	private WakeLock mWakeLock;
 	private SensorManager mSensorManager;
 	private float mLastX,mLastY,mLastZ = 0;
-	private float NOISE = (float) 0.05; //margin of error
-	private float threshold= (float) 0.1;
+	private float threshold= (float) .5; //margin of error
+	private float NOISE = (float) 3+threshold; 
+	private float NOISEZ = 9+threshold;
 	private float mAccel; // acceleration apart from gravity
 	private float mAccelCurrent; // current acceleration including gravity
 	private float mAccelLast; // last acceleration including gravity
@@ -59,7 +60,7 @@ public class JusticeService extends Service {
 			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
 			//Accelerometer
 		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 2000);
+		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), 4000);
 		    mAccel = 0.00f;
 		    mAccelCurrent = SensorManager.GRAVITY_EARTH;
 		    mAccelLast = SensorManager.GRAVITY_EARTH;
@@ -76,11 +77,14 @@ public class JusticeService extends Service {
 	      float y = se.values[1];
 	      float z = se.values[2];
 	      /*
+	       * Want Acceleration? 
 	      mAccelLast = mAccelCurrent;
 	      mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
 	      float delta = mAccelCurrent - mAccelLast;
 	      mAccel = mAccel * 0.9f + delta; // perform low-cut filter*/
 	       //prints a load of shit out. Log.e(TAG, ""+mAccel);
+	      // the maximum 
+	      if ((abs(x)<NOISE)|| (abs(y)<NOISE)|| (abs(z)>NOISEZ) ){
 	        if (!initalized) {
 	            mLastX = x;
 	            mLastY = y;
@@ -108,22 +112,27 @@ public class JusticeService extends Service {
 	            /** set the arrows only if above threshold**/
 	            Log.e(TAG, x+","+y+","+z);	            
 	            if ((deltaX > deltaY) && (mLastX>threshold)) {
-	                //iv.setImageResource(R.drawable.shaker_fig_1);
+	                //Do Action X-Axis
 	                current = gestureKey[1];//   
 	                
 	            } else if ((deltaY > deltaX) && (mLastY>threshold)) {
-	                //iv.setImageResource(R.drawable.shaker_fig_2);
+	                //Do Action Y-Axis
 	                current = gestureKey[2];//     
-	            } else if (mLastZ >threshold) {
-	               //iv.setVisibility(View.INVISIBLE);
+	            } else if (abs(mLastZ) >NOISEZ) {
+	               //Do Action Z-AXIS
 	                current =gestureKey[0];//   
 	            }
-	            //Log.e(TAG, current);
+	            Log.e(TAG, current);
 	        }//end of else
-	        
+	      }//end of threshold check
 	    }//end of method 
 
-	    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	    private float abs(float x) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
 	    }
 	  };
 	  

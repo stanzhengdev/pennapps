@@ -52,7 +52,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-6">
-            <!--<div class="pebble">
+            <!--<div class="pebblev1">
               <div class="wristband">
               </div>
               <div class="screen">
@@ -62,16 +62,19 @@
                 </div>
               </div>
             </div>-->
-           <div class="pebblev2">
+           <div class="pebble">
               <div class="frame">
                 <div class="poke-top"></div>
-                <div class="display not-success leap-interactive">
-                  Shake to Unlock
-                  <canvas id="pebblev2"></canvas>
-                </div>
-                <div class="display success leap-interactive">
-                  It works!
-                  <canvas id="pebblev2"></canvas>
+                <div class="display">
+                    <div class="post-success paths">
+                      Phone<br>Unlocked
+                    </div>
+                    <div class="success paths leap-interactive" onclick="swipePhone();">
+                      Shake<br>Me!
+                    </div>
+                    <div class="not-success paths leap-interactive" onclick="grabPebble();">
+                      Grab<br>Me!
+                    </div>
                 </div>
                 <div class="poke-left"></div>
                 <div class="poke-right-1"></div>
@@ -85,6 +88,24 @@
               <div class="phone-shell">
                 <div class="manufacturer">GESTICE</div>
                 <div class="lcd leap-interactive">
+                  <div class="screen-off">&nbsp;</div>
+                  <div class="screen-unlocked">
+                    <time>It works!</time>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <img src="/img/android/Chrome.png" alt="">
+                        Chrome</div>
+                      <div class="col-md-3">
+                        <img src="/img/android/Maps.png" alt="">
+                        Maps</div>
+                      <div class="col-md-3">
+                        <img src="/img/android/Pebble.png" alt="">
+                        Pebble</div>
+                      <div class="col-md-3">
+                        <img src="/img/android/Gestice.png" alt="">
+                        Gestice</div>
+                    </div>
+                  </div>
                   <div class="screen-locked">
                     <div class="android-header-bar"></div>
                     <script type="text/javascript">
@@ -100,9 +121,6 @@
                     //-->
                     </script>
                     <span>Shake to Unlock</span>
-                  </div>
-                  <div class="screen-unlocked">
-                    <time>It works!</time>
                   </div>
                 </div>
               </div>
@@ -137,12 +155,11 @@
           <p><a class="btn btn-default leap-interactive" href="#" role="button">View details &raquo;</a></p>
         </div>
       </div>
+</div>
 
-      <hr>
-
-      <footer>
+      <footer><div class="container">
         <p>&copy; Gestice 2014. Created with love at PennApps Spring 2014.</p>
-      </footer>
+      </div></footer>
     </div> 
 
     <script src="/js/scripts.js"></script>

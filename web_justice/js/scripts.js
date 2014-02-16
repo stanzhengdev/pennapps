@@ -27,13 +27,20 @@ document.body.addEventListener("leap-swipe", function(event){
 
 $(document).ready(function() {
     //set your functions up here
-    var grabPebble = function() {
-        $(".pebblev2").addClass("grabbed")
+    swiped = false;
+    grabPebble = function() {
+        $(".pebble").addClass("grabbed");
+        $(".android").addClass("grabbed");
         console.log("Pebble grabbed");
+        console.log("Phone grabbed");
+        swiped = true;
     }; 
-    var swipePhone = function() {
-        $(".android").addClass("activated")
-        console.log("Phone activated");
+    swipePhone = function() {
+        if(swiped == true){
+            $(".pebble").addClass("activated");
+            $(".android").addClass("activated");
+            console.log("Phone activated");
+        }
     }; 
 
     //put the functions into an array
@@ -45,5 +52,9 @@ $(document).ready(function() {
     //update any number of them at once
     $().leap("setEvents",events);  
 });
+
+document.body.addEventListener("grabbed", function(event){
+    console.log("Phone activated");
+})
 
 

@@ -57,6 +57,7 @@ h1, h2, h3, h4, h5 {
     color: inherit;
 }
 nav {
+    border-top: 4px solid @pebble;
     line-height: 4em;
     text-align: right;
     a {
@@ -72,19 +73,21 @@ nav {
 .wood-bg {
     background: url(http://i.imgur.com/fEmKv9W.jpg) gray;
 }
+@wood: #702500;
+@pebble: FF4700;
 #info {
     text-align: center;
     color: white;
     padding: 20px;
     font-size: 30px;
-    background: #702500;
+    background: @wood;
 }
 #demo {
     padding-top: 80px;
     color: #ffffff;
     overflow: hidden;
     box-shadow: inset 0 -2px 2px gray, inset 0 2px 2px gray;
-    .pebblev2 {
+    .pebble {
         transition: all 0.25s ease-in-out;
         .frame {
             background-color: #ba625a;
@@ -130,6 +133,27 @@ nav {
                 text-align: center!important;
                 font-size: 32px!important;
                 overflow: hidden;
+                -webkit-font-smoothing: none;
+                font-family: Roboto, Arial;
+                color: lightGray;
+                -moz-user-select: none;
+                -webkit-user-select: none;
+                font-weight: 500;
+                .paths {
+                    padding-top: 1em;
+                    height: 100%;
+                    width: 100%;
+                    display: block;
+                    position: absolute;
+                    top: 0; left: 0;
+                    background: black;
+                    &.leap-interactive {
+                        cursor: pointer!important;
+                        &:hover {
+                            box-shadow: inset 0 0 0 4px yellow;
+                        }
+                    }
+                }
             }
 
         }
@@ -137,7 +161,7 @@ nav {
             display: none!important;
         }
     }
-    .pebble {
+    /* .pebblev1 {
         transition: all 0.25s ease-in-out;
         .wristband {
             height: 350px;
@@ -171,7 +195,7 @@ nav {
                 box-shadow: inset 0 0 2px black;
             }
         }
-    }
+    } */
     .android {
         transition: all 0.25s ease-in-out;
         .phone-shell {
@@ -193,21 +217,36 @@ nav {
                 color: lighten(#2d2d2d, 60%);
             }
             .lcd {
-                background-color: #ffffff;
+                overflow: hidden;
+                background-color: black;
                 display: block;
                 height: 100%;
                 font-family: 'Roboto', Arial;
+                position: relative;
+                text-align: center;
                 &.hover {
                     .screen-locked {
                         display: none!important;
                     }
                 }
+                .screen-off {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    top: 0; left: 0;
+                    background: black;
+                    z-index: 50;
+                }
                 .screen-locked {
+                    position: absolute;
+                    width: 100%;
+                    top: 0; left: 0;
                     text-shadow: 0 1px 1px rgba(0,0,0,.65);
                     text-align: center;
                     background: linear-gradient(-45deg, #46d3ab,#79ced7 50%);
                     display: block;
                     height: 100%;
+                    transition: all 0.75s ease-in-out;
                     time {
                         font-size: 80px;
                         font-family: Roboto;
@@ -215,6 +254,9 @@ nav {
                     }
                 }
                 .screen-unlocked {
+                    position: absolute;
+                    width: 100%;
+                    top: 0; left: 0;
                     text-shadow: 0 1px 1px rgba(0,0,0,.65);
                     text-align: center;
                     background: linear-gradient(-45deg, #f0231f,#fc654f 50%);
@@ -230,15 +272,104 @@ nav {
             }
         }
     }
-    &.grabbed {
-        .screen-locked {
-            display: none!important;
-        }
-    }
+    // &.grabbed {
+    //     .screen-locked {
+    //         display: none!important;
+    //     }
+    // }
 
 }
-.grabbed {
-    -webkit-transform:scale(0.7);
-    transform:scale(0.7);
+footer {
+    padding: 30px 0px;
+    background: @wood;
+    color: white;
+    text-align: center;
 }
+@-webkit-keyframes shake {
+  0%, 100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+
+  10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translateX(-10px);
+    transform: translateX(-10px);
+  }
+
+  20%, 40%, 60%, 80% {
+    -webkit-transform: translateX(10px);
+    transform: translateX(10px);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    -webkit-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+  }
+
+  10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translateX(-10px);
+    -ms-transform: translateX(-10px);
+    transform: translateX(-10px);
+  }
+
+  20%, 40%, 60%, 80% {
+    -webkit-transform: translateX(10px);
+    -ms-transform: translateX(10px);
+    transform: translateX(10px);
+  }
+}
+@keyframes unlock {
+  0% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    -webkit-transform: scale(1.25);
+    -ms-transform: scale(1.25);
+    transform: scale(1.25);
+    opacity: 0.7;
+  }
+
+  100% {
+    -webkit-transform: scale(1.5);
+    -ms-transform: scale(1.5);
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.pebble.grabbed {
+    transform: scale(110%); -webkit-transform: scale(110%);
+    .not-success {
+        opacity: 0;
+        display: none!important;
+    }
+}
+.android.grabbed .screen-off {
+    opacity: 0;
+}
+.pebble.activated {
+    -webkit-animation: shake 1s;
+    animation: shake 1s;
+    .success {
+        opacity: 0;
+        display: none!important;
+    }
+}
+.android.activated {
+    -webkit-animation: shake 1s;
+    animation: shake 1s;
+    .screen-locked {
+        transition: all 0.75s 5s ease-in-out;
+        transform: translateY(50px) scale(.35); -webkit-transform: translateY(50px) scale(.35);
+        opacity: 0;
+    }
+}
+
 @import url(http://fonts.googleapis.com/css?family=Oswald);

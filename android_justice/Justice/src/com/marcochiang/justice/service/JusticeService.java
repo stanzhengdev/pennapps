@@ -12,6 +12,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Handler;
+
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -24,7 +30,15 @@ public class JusticeService extends Service {
 	
 	public static final String TAG = "JusticeService";
 	public static final UUID JUSTICE_APP_UUID = UUID.fromString("259047ec-66dc-4f44-b3b5-1d1477fc7a90");
+
 	private WakeLock mWakeLock;
+	private SensorManager mSensorManager;
+	private float x,y,z = 0;
+	private float treshold = 0;
+	private float mAccel; // acceleration apart from gravity
+	private float mAccelCurrent; // current acceleration including gravity
+	private float mAccelLast; // last acceleration including gravity
+	private boolean initalized = false;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -40,12 +54,48 @@ public class JusticeService extends Service {
 		try {
 			// Start the Justice pebble app
 			PebbleKit.startAppOnPebble(getApplicationContext(), JUSTICE_APP_UUID);
+			//Accelerometer
+		    mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		    mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+		    mAccel = 0.00f;
+		    mAccelCurrent = SensorManager.GRAVITY_EARTH;
+		    mAccelLast = SensorManager.GRAVITY_EARTH;
 		} catch (Exception e) {
 			Log.e(TAG, "Stuff didn't work...");
 			e.printStackTrace();
 		}
 	}
-	
+
+	  private final SensorEventListener mSensorListener = new SensorEventListener() {
+
+	    public void onSensorChanged(SensorEvent se) {
+	      float tempX = se.values[0];
+	      float tempY = se.values[1];
+	      float tempZ = se.values[2];
+	      /*
+	      mAccelLast = mAccelCurrent;
+	      mAccelCurrent = (float) Math.sqrt((double) (x*x + y*y + z*z));
+	      float delta = mAccelCurrent - mAccelLast;
+	      mAccel = mAccel * 0.9f + delta; // perform low-cut filter*/
+	       //prints a load of shit out. Log.e(TAG, ""+mAccel);
+	        if (!initalized) {
+	            x = tempX;
+	            y = tempY;
+	            y = tempZ;
+	            initalized = true;}
+	        else{
+	        	
+	        	
+	        }
+	        
+		
+	    }//end of method 
+
+	    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+	    }
+	  };
+	  
+	  
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d(TAG, "onStartCommand()");

@@ -22,7 +22,6 @@ import android.widget.Toast;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.marcochiang.justice.service.*;//.service.AccelerometrService;
-import com.marcochiang.justice.service.AccelerometerService;
 
 
 /*

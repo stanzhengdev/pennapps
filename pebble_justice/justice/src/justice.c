@@ -36,9 +36,9 @@ static int frequency = 100;
 bool running = false;
 bool gesture = false;
 int axis = 0;
-char* first_string;
-char* second_string;
-char* third_string;
+char *first_string = NULL;
+char *second_string = NULL;
+char *third_string = NULL;
 int16_t gesture_countdown = GESTURE_TIMER;
 AccelData sample_history[SAMPLE_HISTORY_SIZE];
 
@@ -121,20 +121,33 @@ static void handle_accel(AccelData *accel_data, uint32_t num_samples) { }
 
 //Appmessage handlers
 static void in_received_handler(DictionaryIterator* iter, void* context){
-  char *type = dict_find(iter, 100)->value->cstring;
+  //split into tuple then string because of dereferencing null pointer
+  Tuple *type_tuple = dict_find(iter, 100);
+  char *type = type_tuple->value->cstring;
 
   if (strcmp("apps", type) == 0) {
     Tuple *first_tuple = dict_find(iter, FIRST_KEY);
     Tuple *second_tuple = dict_find(iter, SECOND_KEY);
     Tuple *third_tuple = dict_find(iter, THIRD_KEY);
 
-    first_string = first_tuple->value->cstring;
-    second_string = second_tuple->value->cstring;
-    third_string = third_tuple->value->cstring;
+    if (first_string == NULL) {
+      // Initialize all the strings
+      first_string = (char *)malloc(20 * sizeof(char));
+      second_string = (char *)malloc(20 * sizeof(char));
+      third_string = (char *)malloc(20 * sizeof(char));
+
+      first_string[19] = second_string[19] = third_string[19] = 0;
+    }
+
+    first_string = strncpy(first_string, first_tuple->value->cstring, 19);
+    second_string = strncpy(second_string, second_tuple->value->cstring, 19);
+    third_string = strncpy(third_string, third_tuple->value->cstring, 19);
+
   } else if (strcmp("matched", type) == 0) {
     char *result = dict_find(iter, FIRST_KEY)->value->cstring;
 
-    if (strcmp(result, "success")){
+    if (strcmp(result, "success") == 0){
+      vibes_short_pulse();
       text_layer_set_text(first_name_layer, "Launch");
       if(axis==0){
         text_layer_set_text(last_name_layer, first_string);  
@@ -145,7 +158,6 @@ static void in_received_handler(DictionaryIterator* iter, void* context){
       else if(axis==2){
         text_layer_set_text(last_name_layer, third_string);  
       }
-      vibes_short_pulse();
     }
   }
 }

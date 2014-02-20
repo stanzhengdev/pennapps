@@ -1,4 +1,4 @@
-package com.gestice.app.receiver;
+package org.gestice.app.receiver;
 
 import com.marcochiang.justice.R;
 

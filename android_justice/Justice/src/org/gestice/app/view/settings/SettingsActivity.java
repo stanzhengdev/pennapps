@@ -1,7 +1,8 @@
-package com.gestice.app.view.settings;
+package org.gestice.app.view.settings;
+
+import org.gestice.app.receiver.JusticeAdminReceiver;
 
 import com.marcochiang.justice.R;
-import com.gestice.app.receiver.JusticeAdminReceiver;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;

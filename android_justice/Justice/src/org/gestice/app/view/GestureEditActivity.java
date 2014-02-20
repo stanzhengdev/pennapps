@@ -1,12 +1,13 @@
-package com.gestice.app.view;
+package org.gestice.app.view;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.gestice.app.model.GestureCellModel;
+
 import com.marcochiang.justice.R;
-import com.gestice.app.model.GestureCellModel;
 
 import android.app.Activity;
 import android.content.Context;

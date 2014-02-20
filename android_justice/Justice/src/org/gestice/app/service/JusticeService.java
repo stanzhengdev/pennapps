@@ -1,4 +1,4 @@
-package com.marcochiang.justice.service;
+package org.gestice.app.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,14 +7,14 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
+import org.gestice.app.model.GestureCellModel;
+import org.gestice.app.receiver.JusticeBroadcastReceiver;
+import org.gestice.app.view.BridgeActivity;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
-import com.marcochiang.justice.model.GestureCellModel;
-import com.marcochiang.justice.receiver.JusticeBroadcastReceiver;
-import com.marcochiang.justice.view.BridgeActivity;
 
 import android.annotation.SuppressLint;
 import android.app.Service;

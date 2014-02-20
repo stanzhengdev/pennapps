@@ -1,4 +1,4 @@
-package com.gestice.app.model;
+package org.gestice.app.model;
 
 import java.util.ArrayList;
 

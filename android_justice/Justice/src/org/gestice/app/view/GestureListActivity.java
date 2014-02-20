@@ -1,15 +1,16 @@
-package com.marcochiang.justice.view;
+package org.gestice.app.view;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.gestice.app.model.GestureCellModel;
+import org.gestice.app.service.JusticeService;
+import org.gestice.app.view.settings.SettingsActivity;
+
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 import com.marcochiang.justice.R;
-import com.marcochiang.justice.model.GestureCellModel;
-import com.marcochiang.justice.service.JusticeService;
-import com.marcochiang.justice.view.settings.SettingsActivity;
 
 import android.os.Bundle;
 import android.os.Handler;

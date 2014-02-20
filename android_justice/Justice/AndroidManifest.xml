@@ -17,8 +17,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
+        <!-- Activities -->
         <activity
-            android:name="com.marcochiang.justice.view.GestureListActivity"
+            android:name="org.gestice.app.view.GestureListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,13 +29,14 @@
             </intent-filter>
         </activity>
         
-        <service android:name="com.marcochiang.justice.service.JusticeService" />
-        <activity android:name="com.marcochiang.justice.view.GestureEditActivity" />
-        <activity android:name="com.marcochiang.justice.view.settings.SettingsActivity" />
-        <activity android:name="com.marcochiang.justice.view.settings.ChangePinActivity" />
-        <activity android:name="com.marcochiang.justice.view.BridgeActivity" />
+        <activity android:name="org.gestice.app.view.GestureEditActivity" />
+		<activity android:name="org.gestice.app.view.settings.SettingsActivity" />
+	    <activity android:name="org.gestice.app.view.settings.ChangePinActivity" />
+        <activity android:name="org.gestice.app.view.BridgeActivity" />
         
-        <receiver android:name="com.marcochiang.justice.receiver.JusticeAdminReceiver"
+        <!-- Services and receivers -->
+        <service android:name="org.gestice.app.service.JusticeService" />
+        <receiver android:name="org.gestice.app.receiver.JusticeAdminReceiver"
             android:label="@string/gestice_device_admin"
             android:description="@string/gestice_device_admin_desc"
             android:permission="android.permission.BIND_DEVICE_ADMIN">

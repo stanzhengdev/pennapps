@@ -1,6 +1,6 @@
-package com.marcochiang.justice.receiver;
+package org.gestice.app.receiver;
 
-import com.marcochiang.justice.view.settings.SettingsActivity;
+import org.gestice.app.view.settings.SettingsActivity;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;

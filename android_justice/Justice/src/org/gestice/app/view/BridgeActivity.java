@@ -1,4 +1,4 @@
-package com.marcochiang.justice.view;
+package org.gestice.app.view;
 
 import com.marcochiang.justice.R;
 

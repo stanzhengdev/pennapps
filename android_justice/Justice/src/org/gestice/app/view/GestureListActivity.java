@@ -10,7 +10,7 @@ import org.gestice.app.view.settings.SettingsActivity;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
-import com.marcochiang.justice.R;
+import org.gestice.app.R;
 
 import android.os.Bundle;
 import android.os.Handler;

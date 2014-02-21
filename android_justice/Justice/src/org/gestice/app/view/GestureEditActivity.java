@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 import org.gestice.app.model.GestureCellModel;
 
-import com.marcochiang.justice.R;
+import org.gestice.app.R;
 
 import android.app.Activity;
 import android.content.Context;

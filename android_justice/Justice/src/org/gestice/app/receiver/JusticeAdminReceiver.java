@@ -1,6 +1,6 @@
 package org.gestice.app.receiver;
 
-import com.marcochiang.justice.R;
+import org.gestice.app.R;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;

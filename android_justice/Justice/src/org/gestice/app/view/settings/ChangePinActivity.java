@@ -1,6 +1,6 @@
 package org.gestice.app.view.settings;
 
-import com.marcochiang.justice.R;
+import org.gestice.app.R;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;

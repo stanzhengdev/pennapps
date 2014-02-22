@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>1DC4907E-BA9E-4815-A067-89B8AE1FB151</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Gestice</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>C0AB978E-8AB0-4D1D-A3AD-7AA6BE139652</key>
+		<string>https://github.com/stanzheng/pennapps.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ios_justice/Gestice/Gestice.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>C0AB978E-8AB0-4D1D-A3AD-7AA6BE139652</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/stanzheng/pennapps.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>C0AB978E-8AB0-4D1D-A3AD-7AA6BE139652</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>C0AB978E-8AB0-4D1D-A3AD-7AA6BE139652</string>
+			<key>IDESourceControlWCCName</key>
+			<string>pennapps</string>
+		</dict>
+	</array>
+</dict>
+</plist>
